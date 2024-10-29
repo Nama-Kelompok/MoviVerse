@@ -1,6 +1,25 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, JsonResponse 
+from django.urls import reverse
+from django.core import serializers
+from SPARQLWrapper import SPARQLWrapper
 
-# Create your views here.
-def show_main(request):
+# page detail
+def movie_page(request, id):
+    context = {"id": id}
+    return render(request, "detail.html", context)
+
+# page search
+def search_movies(request):
     context = {}
     return render(request, "main.html", context)
+
+def get_movie_data(request, id):
+    print(request.headers)
+    user_agent: str = request.headers["user-agent"]
+    if not user_agent.find("Mozilla"):
+        # sparql = SPARQLWrapper("https://wikidata/sparql")
+        return HttpResponseRedirect(reverse('main:movie_page', kwargs={"id": id}))
+
+    context = {"id": id}
+    return JsonResponse(context)
