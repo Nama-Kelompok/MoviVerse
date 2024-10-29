@@ -139,3 +139,7 @@ GitHub.sublime-settings
 # Python in root
 /*.py
 !manage.py
+!scrapper.py
+
+# Csv file
+/*.csv
