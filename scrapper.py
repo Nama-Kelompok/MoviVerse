@@ -1,124 +1,119 @@
 import pandas as pd
-import requests
-import json
 import os
+from SPARQLWrapper import SPARQLWrapper, JSON
 
-def generate_url(title: str, paging: int):
-    title = title.replace(" ", "%20")
-    title = title.replace(":", "%3A")
-    url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={title}&format=json&errorformat=plaintext&language=en&uselang=en&type=item"
+df = pd.read_csv('imdb_top_1000.csv')
+selected_df = df[['Series_Title', 'Released_Year']]
+sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
+sparql.setReturnFormat(JSON)
 
-    if paging == 0:
-        return url
-    else:
-        return url + f"&continue={paging}"
+new_df = df.copy(True)
+new_df["wikidata_id"] = None
 
-if not os.path.exists("imdb_top_100_with_wikidata.csv"):
-    df = pd.read_csv('imdb_top_1000.csv')
-    titles = df['Series_Title']
-    new_df = df.copy(True)
-    new_df["wikidata_id"] = None
+start_len = None
+if not os.path.exists("imdb_top_1000_with_wikidata.csv"):
+    new_df[0:0].to_csv("imdb_top_1000_with_wikidata.csv", index=False)
+    start_len = 0
+else:
+    temp_df = pd.read_csv('imdb_top_1000_with_wikidata.csv')
+    start_len = len(temp_df)
+    print(temp_df)
 
-    for i, title in enumerate(titles):
-        paging = 0
-        url = generate_url(title, paging) #First paging
-        r = requests.get(url)
-        data = json.loads(r.text)
-        search = data["search"]
-        id = None
+if start_len <= 999:
+    for i in range(start_len, 1000):
+        rows = selected_df.iloc[i]
+        title = rows["Series_Title"]
+        year = rows["Released_Year"]
 
-        if len(search) == 1 and "film" in search[0]["description"]:
-            id = search[0]["id"]
+        if year.isdigit():
+            sparql.setQuery(f"""
+                PREFIX wd: <http://www.wikidata.org/entity/>
+                PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+                SELECT DISTINCT ?id where {{
+                  ?id wdt:P31 wd:Q11424 .
+                  ?id rdfs:label ?filmlabel .
+                  ?id wdt:P577 ?releasedate .
+                  FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
+                  FILTER (YEAR(?releasedate) = {year}) .
+                }}
+            """)
         else:
-            isExit = False
-            while True:
-                for movie in search:
-                    movie["label"] = movie["label"].replace("\u2013", "-").replace(":", "").capitalize()
+            sparql.setQuery(f"""
+                PREFIX wd: <http://www.wikidata.org/entity/>
+                PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+                SELECT DISTINCT ?id where {{
+                  ?id wdt:P31 wd:Q11424 .
+                  ?id rdfs:label ?filmlabel .
+                  ?id wdt:P577 ?releasedate .
+                  FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
+                }}
+            """)
 
-                    if "description" not in movie:
-                        continue
+        result: str = None
+        results = sparql.query().convert()
+        if len(results["results"]["bindings"]) > 0:
+            result = results["results"]["bindings"][0]["id"]["value"]
 
-                    if "film" in movie["description"]:
-                        standarized_title = title.replace(":", "").capitalize()
-                        if standarized_title == movie["label"]:
-                            isExit = True
-                            id = movie["id"]
-                            break
-                        elif "aliases" in movie:
-                            movie["aliases"] = [x.replace("\u2013", "-").replace(":", "").capitalize() for x in movie["aliases"]]
-                            if standarized_title in movie["aliases"]:
-                                isExit = True
-                                id = movie["id"]
-                                break
+        print(f"{i}. {title} : {result}")
+        new_df.loc[i, "wikidata_id"] = result
 
-                if "search-continue" not in data:
-                    break
+        if (i + 1) % 10 == 0:
+            new_df[i-9:i+1].to_csv('imdb_top_1000_with_wikidata.csv', mode='a', header=False, index=False)
 
-                if isExit:
-                    break
+df = pd.read_csv('highest_holywood_grossing_movies.csv')
+selected_df = df[['Title', 'Year']]
+sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
+sparql.setReturnFormat(JSON)
 
-                paging += 7
-                url = generate_url(title, paging)
-                r = requests.get(url)
-                data = json.loads(r.text)
-                search = data["search"]
+new_df = df.copy(True)
+new_df["wikidata_id"] = None
 
-        print(f"{i}. {title}: {id}")
-        new_df.loc[i, "wikidata_id"] = id
-
-    new_df.to_csv('imdb_top_100_with_wikidata.csv', index=False)
-
+start_len = None
 if not os.path.exists("highest_holywood_grossing_movies_with_wikidata.csv"):
-    df = pd.read_csv('highest_holywood_grossing_movies.csv')
-    titles = df['Title']
-    new_df = df.copy(True)
-    new_df["wikidata_id"] = None
+    new_df[0:0].to_csv("highest_holywood_grossing_movies_with_wikidata.csv", index=False)
+    start_len = 0
+else:
+    temp_df = pd.read_csv('highest_holywood_grossing_movies_with_wikidata.csv')
+    start_len = len(temp_df)
+    print(temp_df)
 
-    for i, title in enumerate(titles):
-        paging = 0
-        url = generate_url(title, paging) #First paging
-        r = requests.get(url)
-        data = json.loads(r.text)
-        search = data["search"]
-        id = None
+if start_len <= 999:
+    for i in range(start_len, 1000):
+        rows = selected_df.iloc[i]
+        title = rows["Title"]
+        year = rows["Year"]
 
-        if len(search) == 1 and "film" in search[0]["description"]:
-            id = search[0]["id"]
+        if year is not None:
+            sparql.setQuery(f"""
+                PREFIX wd: <http://www.wikidata.org/entity/>
+                PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+                SELECT DISTINCT ?id where {{
+                  ?id wdt:P31 wd:Q11424 .
+                  ?id rdfs:label ?filmlabel .
+                  ?id wdt:P577 ?releasedate .
+                  FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
+                  FILTER (YEAR(?releasedate) = {year}) .
+                }}
+            """)
         else:
-            isExit = False
-            while True:
-                for movie in search:
-                    movie["label"] = movie["label"].replace("\u2013", "-").replace(":", "").capitalize()
+            sparql.setQuery(f"""
+                PREFIX wd: <http://www.wikidata.org/entity/>
+                PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+                SELECT DISTINCT ?id where {{
+                  ?id wdt:P31 wd:Q11424 .
+                  ?id rdfs:label ?filmlabel .
+                  ?id wdt:P577 ?releasedate .
+                  FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
+                }}
+            """)
 
-                    if "description" not in movie:
-                        continue
+        result: str = None
+        results = sparql.query().convert()
+        if len(results["results"]["bindings"]) > 0:
+            result = results["results"]["bindings"][0]["id"]["value"]
 
-                    if "film" in movie["description"]:
-                        standarized_title = title.replace(":", "").capitalize()
-                        if standarized_title == movie["label"]:
-                            isExit = True
-                            id = movie["id"]
-                            break
-                        elif "aliases" in movie:
-                            movie["aliases"] = [x.replace("\u2013", "-").replace(":", "").capitalize() for x in movie["aliases"]]
-                            if standarized_title in movie["aliases"]:
-                                isExit = True
-                                id = movie["id"]
-                                break
+        print(f"{i}. {title} : {result}")
+        new_df.loc[i, "wikidata_id"] = result
 
-                if "search-continue" not in data:
-                    break
-
-                if isExit:
-                    break
-
-                paging += 7
-                url = generate_url(title, paging)
-                r = requests.get(url)
-                data = json.loads(r.text)
-                search = data["search"]
-
-        print(f"{i}. {title}: {id}")
-        new_df.loc[i, "wikidata_id"] = id
-
-    new_df.to_csv('highest_holywood_grossing_movies_with_wikidata.csv', index=False)
+        if (i + 1) % 10 == 0:
+            new_df[i-9:i+1].to_csv('highest_holywood_grossing_movies_with_wikidata.csv', mode='a', header=False, index=False)
