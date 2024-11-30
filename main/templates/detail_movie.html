@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ movie.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .movie-poster {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .movie-poster img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .movie-details {
+            line-height: 1.8;
+        }
+        .movie-details h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .movie-details p {
+            margin: 5px 0;
+        }
+        .movie-details .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Poster -->
+        <div class="movie-poster">
+            <img src="{{ movie.photoUrl }}" alt="{{ movie.title }}">
+        </div>
+
+        <!-- Movie Details -->
+        <div class="movie-details">
+            <h1>{{ movie.title }} ({{ movie.releaseYear }})</h1>
+            <p><span class="bold">Director:</span> {{ movie.director }}</p>
+            <p><span class="bold">Distributor:</span> {{ movie.distributor }}</p>
+            <p><span class="bold">Genres:</span> {{ movie.genres }}</p>
+            <p><span class="bold">IMDb Rating:</span> {{ movie.rating }}</p>
+            <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
+            <p><span class="bold">Running Time:</span> {{ movie.runningTime }} minutes</p>
+            <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
+            <p><span class="bold">Wikidata URI:</span> <a href="{{ movie.wikidataUri }}" target="_blank">{{ movie.wikidataUri }}</a></p>
+            <p><span class="bold">Information:</span> {{ movie.information }}</p>
+            
+            <!-- Tampilkan daftar aktor -->
+            <p><span class="bold">Stars:</span></p>
+            <ul>
+                {% for star in movie.stars %}
+                    <li>{{ star }}</li>
+                {% endfor %}
+            </ul>
+        </div>        
+    </div>
+</body>
+</html>
