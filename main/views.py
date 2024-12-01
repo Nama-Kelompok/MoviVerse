@@ -6,7 +6,8 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 host = "http://localhost:7200"
 local_sparql = SPARQLWrapper(f"{host}/repositories/Nama-Kelompok")
 local_sparql.setReturnFormat(JSON)
-
+sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
+sparql.setReturnFormat(JSON)
 
 # page detail
 def movie_page(request, id):
@@ -22,7 +23,7 @@ def main_page(request):
     return render(request, "main.html", context)
 
 def search_movies(request):
-    PAGE_SIZE = 10
+    PAGE_SIZE = 20
     movie = request.GET.get("movie", "")
     page = int(request.GET.get("page", 1))
 
@@ -116,8 +117,7 @@ def get_movie_details(request, uri=None):
         OPTIONAL {{ ?movies v:star ?star. }}
         OPTIONAL {{ ?movies v:votes ?votes. }}
         OPTIONAL {{ ?movies v:wikidataUri ?wikidataUri. }}
-
-        FILTER (?movies = <{uri}>)
+        VALUES ?movies {{ <{uri}> }} 
     }}
     GROUP BY ?movies ?title ?director ?rating ?metaScore ?information 
              ?photoUrl ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
@@ -149,7 +149,11 @@ def get_movie_details(request, uri=None):
             for star_uri in stars:
                 if star_uri.strip():
                     star_label = fetch_label(star_uri.strip())
-                    data_movie["stars"].append(star_label)
+                    uri_star = fetch_cast_uri(data_movie["wikidataUri"], star_label)
+                    if("error" in uri_star):
+                        data_movie["stars"].append([star_label, None])
+                    else:
+                        data_movie["stars"].append([star_label, uri_star])
 
             # Ambil label untuk director
             director_uri = data_movie.get("director", "")
@@ -159,15 +163,22 @@ def get_movie_details(request, uri=None):
             else:
                 data_movie["director"] = "Tidak terdapat data director"
 
+            running_time = data_movie.get("runningTime", "")
+            if running_time and running_time.isdigit():  
+                total_minutes = int(running_time)
+                hours = total_minutes // 60
+                minutes = total_minutes % 60
+                data_movie["runningTime"] = f"{hours} Jam {minutes} Menit"
+            else:
+                data_movie["runningTime"] = "Tidak terdapat data waktu tayang"
             return render(request, "detail_movie.html", {"movie": data_movie})
         else:
             return JsonResponse({"error": "Film tidak ditemukan"}, status=404)
+            
 
     except Exception as e:
-        # Jika terjadi error, kembalikan error sebagai JSON
         return JsonResponse({"error": str(e)}, status=500)
     
-
 def fetch_label(uri):
 
     sparql_query = f"""
@@ -192,3 +203,28 @@ def fetch_label(uri):
         print(f"Error fetching label for {uri}: {e}")
         return "Error fetching label"
 
+def fetch_cast_uri(uri, nama):
+    uriid = uri.split("/")[-1]
+
+    sparql_query = f"""
+                PREFIX wd: <http://www.wikidata.org/entity/>
+                PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                SELECT DISTINCT * WHERE {{
+                wd:{uriid} wdt:P31 wd:Q11424 ;
+                    wdt:P161 ?cast.
+                ?cast rdfs:label ?nama
+                FILTER(?nama = "{nama}"@en) 
+                }} LIMIT 1
+                """
+    sparql.setQuery(sparql_query)
+
+    try:
+        results = sparql.query().convert()
+        result = results["results"]["bindings"][0]
+
+        return result["cast"]["value"]
+
+    except Exception as e:
+        return {"error": str(e)}
