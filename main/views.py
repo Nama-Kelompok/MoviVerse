@@ -13,7 +13,9 @@ def movie_page(request, id):
     context = {"id": id}
     return render(request, "detail.html", context)
 
-# page main
+def landing_page(request):
+    return render(request, "landing.html")
+
 def main_page(request):
     search = request.GET.get("search", "")
     context = {"search": search}
