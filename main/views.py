@@ -13,13 +13,60 @@ def movie_page(request, id):
     context = {"id": id}
     return render(request, "detail.html", context)
 
-
-# page search
-def search_movies(request):
-    context = {}
-    print("awtawd")
+# page main
+def main_page(request):
+    search = request.GET.get("search", "")
+    context = {"search": search}
     return render(request, "main.html", context)
 
+def search_movies(request):
+    PAGE_SIZE = 10
+    movie = request.GET.get("movie", "")
+    page = int(request.GET.get("page", 1))
+
+    sparql_query = f"""
+    PREFIX : <http://nama-kelompok.org/data/> 
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX v: <http://nama-kelompok.org/vocab#>
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+    select DISTINCT * where {{
+        ?movieId rdf:type :Movie .
+        ?movieId rdfs:label ?movieName .
+        OPTIONAL {{?movieId v:posterLink ?posterLink .}}
+        FILTER(REGEX(?movieName, ".*{movie}.*", "i"))
+    }} ORDER BY ?movieName
+    OFFSET {(page - 1) * PAGE_SIZE}
+    LIMIT 21
+    """
+    local_sparql.setQuery(sparql_query)
+    query_results = local_sparql.query().convert()["results"]["bindings"]
+
+    hasNextPage = False
+    if len(query_results) > PAGE_SIZE:
+        hasNextPage = True
+        query_results = query_results[:PAGE_SIZE]
+
+    
+    data = {}
+    data["hasNextPage"] = hasNextPage
+    data["currentPage"] = page
+    
+    movies = []
+    for movie in query_results:
+        tempData = {}
+        tempData["movieId"] = movie['movieId']["value"]
+        tempData["movieName"] = movie["movieName"]["value"]
+        if "posterLink" in movie:
+            tempData["posterLink"] = movie["posterLink"]["value"]
+        else:
+            tempData["posterLink"] = ""
+        movies.append(tempData)
+    
+    data["movies"] = movies
+    return JsonResponse(data)
 
 # detail of movie
 def get_movie_data(request, id):
