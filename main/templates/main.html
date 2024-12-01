@@ -21,6 +21,8 @@
         <link rel="stylesheet" href="static/main/css/style.css">
         <!-- Button style  -->
         <link rel="stylesheet" href="static/main/css/button.css">
+        <!-- Card style  -->
+        <link rel="stylesheet" href="static/main/css/card.css">
         <!-- Modernizr JS -->
         <script src="static/user/js/modernizr-2.6.2.min.js"></script>
 
@@ -109,27 +111,54 @@
                 }
 
                 movies.forEach(movie => {
+                    // Membuat elemen card
                     const movieCard = document.createElement("div");
-                    movieCard.classList.add("movie-card");
-
-                    const movieImage = movie.posterLink
-                        ? `<img src="${movie.posterLink}" alt="${movie.movieName}">`
-                        : `<div class="movie-placeholder">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                                </svg>
-                                <p>No Image Available</p>
-                        </div>`;
-
-                    movieCard.innerHTML = `
-                        ${movieImage}
-                        <h3>${movie.movieName}</h3>
-                        <a href="http://127.0.0.1:8000/movie/${movie.movieId}" target="_blank">More Info</a>
-                    `;
-
-
+                    movieCard.classList.add("card");
+                
+                    // Membuat elemen card-container
+                    const cardContainer = document.createElement("div");
+                    cardContainer.classList.add("card-container");
+                
+                    // Menambahkan gambar atau placeholder jika tidak ada
+                    const movieImage = document.createElement("img");
+                    if (movie.posterLink) {
+                        movieImage.src = movie.posterLink;
+                        movieImage.alt = movie.movieName;
+                    } else {
+                        const placeholder = document.createElement("div");
+                        placeholder.classList.add("movie-placeholder");
+                        placeholder.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                            </svg>
+                            <p>No Image Available</p>
+                        `;
+                        cardContainer.appendChild(placeholder);
+                    }
+                
+                    // Membuat elemen judul film
+                    const cardTitle = document.createElement("h3");
+                    cardTitle.textContent = movie.movieName;
+                
+                    // Membuat elemen tautan "More Info"
+                    const moreInfoLink = document.createElement("a");
+                    moreInfoLink.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
+                    moreInfoLink.target = "_blank";
+                    moreInfoLink.textContent = "More Info";
+                
+                    // Menambahkan elemen ke dalam card-container
+                    cardContainer.appendChild(movieImage);
+                    cardContainer.appendChild(cardTitle);
+                    cardContainer.appendChild(moreInfoLink);
+                
+                    // Menambahkan card-container ke dalam card
+                    movieCard.appendChild(cardContainer);
+                
+                    // Menambahkan card ke dalam moviesContainer
                     moviesContainer.appendChild(movieCard);
                 });
+                
+                
             }
 
             function updatePagination() {
