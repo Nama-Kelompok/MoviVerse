@@ -4,90 +4,233 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #searchForm {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        #searchForm input {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #searchForm button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #searchForm button:hover {
+            background-color: #0056b3;
+        }
+
+        #pagination {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        #pagination button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #moviesContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px;
+        }
+
+        .movie-card {
+            width: 200px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            image-rendering: crisp-edges; /* Modern browsers */
+            image-rendering: -webkit-optimize-contrast; /* Safari compatibility */
+            image-rendering: pixelated; /* Optional for retro styles */
+        }
+
+        .movie-placeholder {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #eee;
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .movie-placeholder svg {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+            fill: #888;
+        }
+
+        .movie-card h3 {
+            font-size: 18px;
+            margin: 10px;
+        }
+
+        .movie-card a {
+            display: block;
+            margin: 10px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .movie-card a:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Home Page</h1>
+    <h1>Movie Search</h1>
 
     <!-- Form Pencarian -->
-    <form id="searchForm">
-        <input type="text" id="search" placeholder="Movie..." name="search" value="{{ search }}"/>
+    <form id="searchForm" onsubmit="event.preventDefault(); fetchResult();">
+        <input type="text" id="search" placeholder="Search for movies..." value="{{ search }}" />
         <button type="submit">Search</button>
     </form>
 
-    <br>
-    <br>
-
     <div id="pagination">
-        <button id="prevBtn" onclick="prev()">Prev</button>
+        <button id="prevBtn" onclick="prev()" disabled>Prev</button>
         <span id="currentPage">Page 1</span>
-        <button id="nextBtn" onclick="next(1)">Next</button>
+        <button id="nextBtn" onclick="next()" disabled>Next</button>
     </div>
 
     <div id="moviesContainer">
+        <!-- Movie cards will appear here -->
     </div>
 
     <script>
-        let movie = "{{ search }}"
-        let page = 1
-        let hasNext = false
+        let movie = "{{ search }}";
+        let page = 1;
+        let hasNext = false;
 
-        function fetchResult() {
-            const url = "{% url 'main:search_movie' %}" + "?page=" + page + "&movie=" + movie
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data)
-                    hasNext = data.hasNextPage
-                    
-                    currentPageSpan = document.getElementById("currentPage")
-                    currentPageSpan.textContent = `Page ${page}`
-                    
-                    moviesContainer = document.getElementById("moviesContainer")
-                    moviesContainer.innerHTML = ""
-                    movies = data.movies
-                    movies.forEach(movie => {
-                        const movieCard = document.createElement('div');
-                        movieCard.classList.add('movie-card');  
-                        const movieImage = movie.posterLink ? `<img src="${movie.posterLink}" alt="${movie.movieName}">` : `<div>No Image Available</div>`;
+        async function fetchResult() {
+            const searchInput = document.getElementById("search").value.trim();
+            movie = searchInput || movie;
 
-                        const movieContent = `
-                            ${movieImage}
-                            <h3>${movie.movieName}</h3>
-                            <a href="${movie.movieId}" target="_blank">More Info</a>
-                        `;
-                        movieCard.innerHTML = movieContent;
-                        moviesContainer.appendChild(movieCard);
+            const url = "{% url 'main:search_movie' %}?page=" + page + "&movie=" + movie;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Failed to fetch data");
 
-                        moviesContainer.appendChild(document.createElement('br'));
-                        moviesContainer.appendChild(document.createElement('br'));
-                        moviesContainer.appendChild(document.createElement('br'));
-                    });
-                })
+                const data = await response.json();
+                hasNext = data.hasNextPage;
+
+                updatePagination();
+                renderMovies(data.movies);
+            } catch (error) {
+                console.error(error);
+                document.getElementById("moviesContainer").innerHTML = "<p>Error fetching data. Please try again later.</p>";
+            }
+        }
+
+        function renderMovies(movies) {
+            const moviesContainer = document.getElementById("moviesContainer");
+            moviesContainer.innerHTML = "";
+
+            if (!movies || movies.length === 0) {
+                moviesContainer.innerHTML = "<p>No movies found.</p>";
+                return;
+            }
+
+            movies.forEach(movie => {
+                const movieCard = document.createElement("div");
+                movieCard.classList.add("movie-card");
+
+                const movieImage = movie.posterLink
+                    ? `<img src="${movie.posterLink}" alt="${movie.movieName}">`
+                    : `<div class="movie-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                            </svg>
+                            <p>No Image Available</p>
+                       </div>`;
+
+                movieCard.innerHTML = `
+                    ${movieImage}
+                    <h3>${movie.movieName}</h3>
+                    <a href="http://127.0.0.1:8000/movie/${movie.movieId}" target="_blank">More Info</a>
+                `;
+
+
+                moviesContainer.appendChild(movieCard);
+            });
+        }
+
+        function updatePagination() {
+            document.getElementById("currentPage").textContent = `Page ${page}`;
+            document.getElementById("prevBtn").disabled = page <= 1;
+            document.getElementById("nextBtn").disabled = !hasNext;
         }
 
         function prev() {
-            if (page <= 1) {
-                console.error("Already on the first page")
-                return;
+            if (page > 1) {
+                page--;
+                fetchResult();
             }
-            
-            page--
-            fetchResult()
         }
 
         function next() {
-            if (!hasNext) {
-                console.error("Already on the last page")
-                return;
+            if (hasNext) {
+                page++;
+                fetchResult();
             }
-
-            page++
-            fetchResult()
         }
 
-        window.onload = function() {
-            fetchResult()
-        }
+        window.onload = fetchResult;
     </script>
 </body>
 </html>

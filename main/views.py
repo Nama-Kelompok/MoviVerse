@@ -41,7 +41,7 @@ def search_movies(request):
         FILTER(REGEX(?movieName, ".*{movie}.*", "i"))
     }} ORDER BY ?movieName
     OFFSET {(page - 1) * PAGE_SIZE}
-    LIMIT 21
+    LIMIT {PAGE_SIZE + 1}
     """
     local_sparql.setQuery(sparql_query)
     query_results = local_sparql.query().convert()["results"]["bindings"]
