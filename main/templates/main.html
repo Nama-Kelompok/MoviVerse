@@ -104,26 +104,27 @@
             function renderMovies(movies) {
                 const moviesContainer = document.getElementById("moviesContainer");
                 moviesContainer.innerHTML = "";
-
+            
                 if (!movies || movies.length === 0) {
                     moviesContainer.innerHTML = "<p>No movies found.</p>";
                     return;
                 }
-
+            
                 movies.forEach(movie => {
                     // Membuat elemen card
                     const movieCard = document.createElement("div");
                     movieCard.classList.add("card");
-                
+            
                     // Membuat elemen card-container
                     const cardContainer = document.createElement("div");
                     cardContainer.classList.add("card-container");
-                
+            
                     // Menambahkan gambar atau placeholder jika tidak ada
-                    const movieImage = document.createElement("img");
                     if (movie.posterLink) {
+                        const movieImage = document.createElement("img");
                         movieImage.src = movie.posterLink;
                         movieImage.alt = movie.movieName;
+                        cardContainer.appendChild(movieImage);
                     } else {
                         const placeholder = document.createElement("div");
                         placeholder.classList.add("movie-placeholder");
@@ -135,30 +136,27 @@
                         `;
                         cardContainer.appendChild(placeholder);
                     }
-                
+            
                     // Membuat elemen judul film
                     const cardTitle = document.createElement("h3");
                     cardTitle.textContent = movie.movieName;
-                
+            
                     // Membuat elemen tautan "More Info"
                     const moreInfoLink = document.createElement("a");
                     moreInfoLink.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
                     moreInfoLink.target = "_blank";
                     moreInfoLink.textContent = "More Info";
-                
-                    // Menambahkan elemen ke dalam card-container
-                    cardContainer.appendChild(movieImage);
+            
+                    // Menambahkan elemen judul dan tautan ke dalam card-container
                     cardContainer.appendChild(cardTitle);
                     cardContainer.appendChild(moreInfoLink);
-                
+            
                     // Menambahkan card-container ke dalam card
                     movieCard.appendChild(cardContainer);
-                
+            
                     // Menambahkan card ke dalam moviesContainer
                     moviesContainer.appendChild(movieCard);
                 });
-                
-                
             }
 
             function updatePagination() {
