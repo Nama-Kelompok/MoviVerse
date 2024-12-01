@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -113,12 +114,23 @@ USE_I18N = True
 USE_TZ = True
 
 
+# Base directory of the project
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# URL untuk mengakses file statis
+STATIC_URL = '/static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+# Direktori tambahan tempat Django mencari file statis
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
+# Direktori tempat file statis akan dikumpulkan (hanya untuk production)
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Konfigurasi untuk penyimpanan file statis (gunakan whitenoise untuk production)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
