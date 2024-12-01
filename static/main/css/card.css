@@ -18,14 +18,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-
-    padding: 50px 40px;
-
+    padding: 10px 15px; 
     background-color: #222222;
     color: #ffffff;
-
     border-radius: 12px;
-
+    overflow: hidden;
     transition: 0.2s ease;
 }
 
@@ -35,15 +32,35 @@
 }
 
 .card img {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    image-rendering: crisp-edges; /* Modern browsers */
-    image-rendering: -webkit-optimize-contrast; /* Safari compatibility */
-    image-rendering: pixelated; /* Optional for retro styles */
+    width: 100%; /* Sesuaikan lebar dengan card */
+    height: 60%; /* Proporsional tinggi gambar */
+    object-fit: contain; /* Pastikan gambar tidak terpotong */
+    border-radius: 12px 12px 0 0; /* Sudut membulat pada bagian atas */
 }
 
-.movie-card h3 {
-    font-size: 18px;
-    margin: 10px;
+.card h3 {
+    font-size: 16px; /* Sesuaikan ukuran teks */
+    margin: 10px 0;
+    color: #fff;
+}
+
+.card a {
+    display: inline-block;
+    text-decoration: none;
+    color: #ffab70;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.movie-placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60%; /* Sama dengan tinggi gambar */
+    background-color: #444;
+    border-radius: 12px 12px 0 0;
+    color: #fff;
+    font-size: 14px;
 }
