@@ -21,6 +21,8 @@
         <link rel="stylesheet" href="static/main/css/style.css">
         <!-- Button style  -->
         <link rel="stylesheet" href="static/main/css/button.css">
+        <!-- Button style  -->
+        <link rel="stylesheet" href="static/main/css/buttoninfo.css">
         <!-- Card style  -->
         <link rel="stylesheet" href="static/main/css/card.css">
         <!-- Modernizr JS -->
@@ -141,15 +143,27 @@
                     const cardTitle = document.createElement("h3");
                     cardTitle.textContent = movie.movieName;
             
-                    // Membuat elemen tautan "More Info"
-                    const moreInfoLink = document.createElement("a");
-                    moreInfoLink.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
-                    moreInfoLink.target = "_blank";
-                    moreInfoLink.textContent = "More Info";
+                    // Membuat elemen tombol "More Info"
+                    const moreInfoButton = document.createElement("button");
+                    moreInfoButton.classList.add("btninfo");
+                    moreInfoButton.innerHTML = `
+                        <div class="btninfo__bg">
+                            <span class="btninfo__bg__layer btninfo__bg__layer-first"></span>
+                            <span class="btninfo__bg__layer btninfo__bg__layer-second"></span>
+                            <span class="btninfo__bg__layer btninfo__bg__layer-third"></span>
+                        </div>
+                        <span class="btninfo__text-out">More Info</span>
+                        <span class="btninfo__text-in">More Info</span>
+                    `;
             
-                    // Menambahkan elemen judul dan tautan ke dalam card-container
+                    // Event listener untuk tombol "More Info"
+                    moreInfoButton.addEventListener("click", () => {
+                        window.location.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
+                    });
+            
+                    // Menambahkan elemen judul dan tombol ke dalam card-container
                     cardContainer.appendChild(cardTitle);
-                    cardContainer.appendChild(moreInfoLink);
+                    cardContainer.appendChild(moreInfoButton);
             
                     // Menambahkan card-container ke dalam card
                     movieCard.appendChild(cardContainer);
@@ -158,6 +172,7 @@
                     moviesContainer.appendChild(movieCard);
                 });
             }
+            
 
             function updatePagination() {
                 document.getElementById("currentPage").textContent = `Page ${page}`;
