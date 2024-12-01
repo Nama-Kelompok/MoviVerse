@@ -39,8 +39,7 @@
 					<div class="col-xs-12 text-center menu-1 menu-wrap">
 						<ul>
 							<li class="active"><a href="{% url 'main:landing_page'%}">Home</a></li>
-							<li><a href="{% url 'main:landing_page'%}">Login</a></li>
-							<li><a href="{% url 'main:landing_page'%}">Sign Up</a></li>
+							<li><a href="{% url 'main:main_page'%}">Search</a></li>
 						</ul>
 					</div>
 				</div>
@@ -67,14 +66,15 @@
 	<div id="moviverse-about" class="moviverse-section" >
 		<div class="container">
 			<div class="row">
-				<div class="col-md-6 col-md-pull-4 img-wrap animate-box" data-animate-effect="fadeInLeft">
-					<img src="static/user/images/hhh.webp" alt="Free Restaurant Bootstrap Website Template by FreeHTML5.co">
+				<div class="col-md-7 img-wrap animate-box" data-animate-effect="fadeInLeft">
+					<img src="static/user/images/movie.jpg">
 				</div>
 				<div class="col-md-5 col-md-push-1 animate-box">
 					<div class="section-heading">
 						<h2>Our Vision</h2>
-						<p>At MoviVerse, we believe that every movie opens a door to new worlds, ideas, and perspectives. Our vision is to create a community where the joy of watching and the power of enjoying good movies are accessible to everyone, everywhere. 
+						<p>At MoviVerse, we believe that movies are more than just entertainment—they are gateways to new worlds, fresh ideas, and diverse perspectives that inspire, educate, and connect us all. Each story told on the big screen has the power to transport us, offering glimpses into lives we’ve never lived and cultures we’ve never experienced. It is this universal appeal of cinema that fuels our vision: to create a vibrant, inclusive community where the joy of watching movies and the transformative power of storytelling are accessible to everyone, regardless of where they are or who they are.
 
+							We aim to build a space where movie enthusiasts from all walks of life can come together to celebrate their shared love for film, discover hidden gems, and explore the endless possibilities of creative expression. By making high-quality movies and meaningful conversations about them accessible to people everywhere, MoviVerse strives to break down barriers, spark curiosity, and foster a deeper appreciation for the art of cinema in all its forms.							
 						</p>							
 					</div>
 				</div>
@@ -82,41 +82,30 @@
 		</div>
 	</div>
 	
-
-	<div id="moviverse-featured-menu" class="moviverse-section" >
+	<div id="moviverse-featured-menu" class="moviverse-section">
 		<div class="container">
-			<div class="row">
-				<div class="col-md-12 moviverse-heading animate-box">
-					<h2>Our Features</h2>
-					<div class="row">
-						<div class="col-md-6">
-							<p>At MoviVerse, we're dedicated to enhancing your watching experience with our distinctive features. Our platform is designed to cater to your unique watching preferences and connect you with a vibrant community of true movie lovers.</p>
-						</div>
-					</div>
-				</div>
-	
-				<!-- Wishlist Feature -->
-				<div class="col-md-4 col-sm-6 col-xs-12 moviverse-item-wrap animate-box">
-					<div class="moviverse-item">
-						<img src="static/user/images/wishlist.gif" class="img-responsive" alt="moviverse Wishlist Feature">
-						<h3>Wishlist</h3>
-						<p>Discover and save your next movie with our Wishlist feature. Easily add movies to your wishlist, keep track of titles you're interested in, and receive notifications when they become available or go on sale. It's the perfect tool to curate your watching journey.</p>
-					</div>
-				</div>
-	
-				<!-- Review Feature -->
-				<div class="col-md-4 col-sm-6 col-xs-12 moviverse-item-wrap animate-box">
-					<div class="moviverse-item">
-						<img src="static/user/images/movie.gif" class="img-responsive" alt="moviverse Review Feature">
-						<h3>Review</h3>
-						<p>Share your thoughts and engage with other watchers through our Review feature. Write reviews, rate movies, and read what others have to say. This interactive platform allows you to explore different viewpoints and find recommendations from like-minded watchers.</p>
-					</div>
-				</div>
+		  <div class="row">
+			<div class="col-md-12 moviverse-heading animate-box">
+			  <h2>Our Features</h2>
+			  <p>
+				At MoviVerse, we're dedicated to enhancing your watching experience with our distinctive features. Our platform is designed to cater to your unique watching preferences and connect you with a vibrant community of true movie lovers.
+			  </p>
 			</div>
+			<!-- Search Feature -->
+			<div class="moviverse-item-wrap animate-box">
+			  <div class="moviverse-item">
+				<img src="static/user/images/movie.gif" class="img-responsive" alt="Moviverse Search Feature">
+				<h3>Search</h3>
+				<p>
+				  The Search feature enables you to quickly find movies by their titles. Whether you're looking for a specific film or just exploring your favorite genres, this feature makes it easy to locate what you’re searching for. Simply type in the title of a movie, and the system will provide you with instant results. Designed for simplicity and speed, the Search feature ensures you can effortlessly access the movies you want to watch in no time.
+				</p>
+			  </div>
+			</div>
+		  </div>
 		</div>
-	</div>	
-
-	<div id="moviverse-blog" class="moviverse-section">
+	  </div>
+	  
+	  <div id="moviverse-blog" class="moviverse-section">
 		<div class="container">
 			<div class="row animate-box">
 				<div class="col-md-8 col-md-offset-2 text-center moviverse-heading animate-box">
@@ -126,7 +115,7 @@
 			</div>
 			<div class="row">
 				<!-- Team Member 1 -->
-				<div class="col-md-4">
+				<div class="col-md-3 col-sm-6">
 					<div class="moviverse-blog animate-box">
 						<div class="blog-bg" style="background-image: url('static/user/images/surya.jpg');"></div>
 						<div class="blog-text">
@@ -136,38 +125,39 @@
 					</div>
 				</div>
 				<!-- Team Member 2 -->
-				<div class="col-md-4">
+				<div class="col-md-3 col-sm-6">
 					<div class="moviverse-blog animate-box">
 						<div class="blog-bg" style="background-image: url('static/user/images/rafli.jpg');"></div>
 						<div class="blog-text">
 							<h3 style="color: beige;">Muhammad Rafli Mahesa</h3>
-							<p>220178599348759813457</p>
+							<p>2206828140</p>
 						</div> 
 					</div>
 				</div>
 				<!-- Team Member 3 -->
-				<div class="col-md-4">
+				<div class="col-md-3 col-sm-6">
 					<div class="moviverse-blog animate-box">
 						<div class="blog-bg" style="background-image: url('static/user/images/bimo.jpg');"></div>
 						<div class="blog-text">
 							<h3 style="color: beige;">Bimantoro Widyadana</h3>
-							<p>220321534413</p>
+							<p>2206824306</p>
 						</div> 
 					</div>
 				</div>
 				<!-- Team Member 4 -->
-				<div class="col-md-4">
+				<div class="col-md-3 col-sm-6">
 					<div class="moviverse-blog animate-box">
 						<div class="blog-bg" style="background-image: url('static/user/images/bimo.jpg');"></div>
 						<div class="blog-text">
 							<h3 style="color: beige;">Farrel Muhammad Hanau</h3>
-							<p>223211325</p>
+							<p>2206081566</p>
 						</div> 
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+	
 		
 	<footer id="moviverse-footer" role="contentinfo" class="moviverse-section">
 			<div class="row copyright">
@@ -208,6 +198,5 @@
 	<script src="static/user/js/jquery.flexslider-min.js"></script>
 	<!-- Main -->
 	<script src="static/user/js/main.js"></script>
-
 	</body>
 </html>

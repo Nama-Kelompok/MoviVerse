@@ -456,17 +456,54 @@ h1, h2, h3, h4, h5, h6, figure {
   font-family: "Satisfy", cursive;
 }
 
-#moviverse-about .img-wrap img {
-  margin-bottom: 10px;
+#moviverse-about .img-wrap {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
 }
+
+#moviverse-about .img-wrap img {
+  margin-top: 50px;
+  margin-bottom: 10px;
+  margin-right: 20px;
+  max-width: 100%; 
+  height: auto; 
+}
+
 @media screen and (max-width: 992px) {
   #moviverse-about .img-wrap img {
     max-width: 100%;
   }
 }
 
+@media screen and (max-width: 480px) {
+  #moviverse-about .img-wrap img {
+    max-width: 100%;
+  }
+}
+
+#moviverse-featured-menu {
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  min-height: 100vh; 
+  text-align: center;
+}
+
+#moviverse-featured-menu .container {
+  max-width: 650px;
+}
+
+#moviverse-featured-menu .moviverse-heading h2 {
+  font-size: 2rem; 
+}
+
+#moviverse-featured-menu .moviverse-item img {
+  margin: 0 auto; 
+}
+
 #moviverse-featured-menu .moviverse-heading, #moviverse-gallery .moviverse-heading, #moviverse-reservation-form .moviverse-heading {
-  margin-bottom: 100px;
+  margin-bottom: 10px;
 }
 @media screen and (max-width: 768px) {
   #moviverse-featured-menu .moviverse-heading, #moviverse-gallery .moviverse-heading, #moviverse-reservation-form .moviverse-heading {
@@ -486,7 +523,7 @@ h1, h2, h3, h4, h5, h6, figure {
   width: 100%;
 }
 #moviverse-featured-menu .moviverse-item.margin_top, #moviverse-gallery .moviverse-item.margin_top, #moviverse-reservation-form .moviverse-item.margin_top {
-  margin-top: 50px;
+  margin-top: 10px;
 }
 @media screen and (max-width: 480px) {
   #moviverse-featured-menu .moviverse-item.margin_top, #moviverse-gallery .moviverse-item.margin_top, #moviverse-reservation-form .moviverse-item.margin_top {
@@ -554,7 +591,7 @@ h1, h2, h3, h4, h5, h6, figure {
 }
 @media screen and (max-width: 768px) {
   #moviverse-slider,
-  #moviverse-about,
+  #moviverse-section,
   #moviverse-wireframe,
   #moviverse-started,
   #moviverse-portfolio,
