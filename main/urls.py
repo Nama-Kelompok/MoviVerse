@@ -9,4 +9,5 @@ urlpatterns = [
     path('wiki/<str:id>', movie_page, name='movie_page'),
     path('entity/<str:id>', get_movie_data, name='get_movie_data'),
     path("movie/<path:uri>/", views.get_movie_details, name="movie_detail"),
+    path("search", search_movies, name="search_movie")
 ]
