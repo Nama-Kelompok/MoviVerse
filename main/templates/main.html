@@ -1,1 +1,93 @@
-<h1>Knowledge Graph</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Page</title>
+</head>
+<body>
+    <h1>Home Page</h1>
+
+    <!-- Form Pencarian -->
+    <form id="searchForm">
+        <input type="text" id="search" placeholder="Movie..." name="search" value="{{ search }}"/>
+        <button type="submit">Search</button>
+    </form>
+
+    <br>
+    <br>
+
+    <div id="pagination">
+        <button id="prevBtn" onclick="prev()">Prev</button>
+        <span id="currentPage">Page 1</span>
+        <button id="nextBtn" onclick="next(1)">Next</button>
+    </div>
+
+    <div id="moviesContainer">
+    </div>
+
+    <script>
+        let movie = "{{ search }}"
+        let page = 1
+        let hasNext = false
+
+        function fetchResult() {
+            const url = "{% url 'main:search_movie' %}" + "?page=" + page + "&movie=" + movie
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    hasNext = data.hasNextPage
+                    
+                    currentPageSpan = document.getElementById("currentPage")
+                    currentPageSpan.textContent = `Page ${page}`
+                    
+                    moviesContainer = document.getElementById("moviesContainer")
+                    moviesContainer.innerHTML = ""
+                    movies = data.movies
+                    movies.forEach(movie => {
+                        const movieCard = document.createElement('div');
+                        movieCard.classList.add('movie-card');  
+                        const movieImage = movie.posterLink ? `<img src="${movie.posterLink}" alt="${movie.movieName}">` : `<div>No Image Available</div>`;
+
+                        const movieContent = `
+                            ${movieImage}
+                            <h3>${movie.movieName}</h3>
+                            <a href="${movie.movieId}" target="_blank">More Info</a>
+                        `;
+                        movieCard.innerHTML = movieContent;
+                        moviesContainer.appendChild(movieCard);
+
+                        moviesContainer.appendChild(document.createElement('br'));
+                        moviesContainer.appendChild(document.createElement('br'));
+                        moviesContainer.appendChild(document.createElement('br'));
+                    });
+                })
+        }
+
+        function prev() {
+            if (page <= 1) {
+                console.error("Already on the first page")
+                return;
+            }
+            
+            page--
+            fetchResult()
+        }
+
+        function next() {
+            if (!hasNext) {
+                console.error("Already on the last page")
+                return;
+            }
+
+            page++
+            fetchResult()
+        }
+
+        window.onload = function() {
+            fetchResult()
+        }
+    </script>
+</body>
+</html>
