@@ -483,23 +483,23 @@ h1, h2, h3, h4, h5, h6, figure {
 }
 
 #moviverse-featured-menu {
-  display: flex; /* Aktifkan Flexbox untuk tata letak */
-  justify-content: center; /* Pusatkan secara horizontal */
-  align-items: center; /* Pusatkan secara vertikal */
-  min-height: 100vh; /* Pastikan elemen mencakup tinggi layar penuh */
-  text-align: center; /* Pusatkan teks secara horizontal */
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  min-height: 100vh; 
+  text-align: center;
 }
 
 #moviverse-featured-menu .container {
-  max-width: 650px; /* Batasi lebar kontainer untuk tampilan yang lebih rapi */
+  max-width: 650px;
 }
 
 #moviverse-featured-menu .moviverse-heading h2 {
-  font-size: 2rem; /* Perbesar ukuran teks judul jika perlu */
+  font-size: 2rem; 
 }
 
 #moviverse-featured-menu .moviverse-item img {
-  margin: 0 auto; /* Pastikan gambar tetap berada di tengah */
+  margin: 0 auto; 
 }
 
 #moviverse-featured-menu .moviverse-heading, #moviverse-gallery .moviverse-heading, #moviverse-reservation-form .moviverse-heading {
