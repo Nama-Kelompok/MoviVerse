@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+ :root {
+	 --color-main: #a474ff;
+	 --color-main-second: #17f1d1;
+	 --color-main-third: #ece1df;
+}
+
+.btninfo {
+    margin-top: auto;
+    display: inline-block;
+    height: 10%;
+    width: 90%;
+    position: relative;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    background-color: transparent;
+    transition: transform 0.3s ease;
+}
+
+.btninfo:hover .btninfo__bg {
+    scale: 0.94;
+}
+ .btninfo:hover .btninfo__text-out {
+    transition: transform 1s cubic-bezier(0.32, 0.99, 0.49, 0.99), opacity 0.4s;
+    transform: translateY(-33.333333%);
+    opacity: 0;
+}
+ .btninfo:hover .btninfo__text-in {
+    transition: 1s all cubic-bezier(0.32, 0.99, 0.49, 0.99);
+    transform: translateY(0);
+    opacity: 1;
+}
+ .btninfo:hover .btninfo__bg__layer-first, .btninfo:hover .btninfo__bg__layer-second, .btninfo:hover .btninfo__bg__layer-third {
+    border-radius: 60% 60% 0 0;
+    transform: translateY(1rem);
+}
+ .btninfo:hover .btninfo__bg__layer-first {
+	 transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1) 200ms, border-radius 0.2s cubic-bezier(0.19, 1, 0.22, 1) 270ms;
+}
+ .btninfo:hover .btninfo__bg__layer-second {
+	 transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1) 300ms, border-radius 0.2s cubic-bezier(0.19, 1, 0.22, 1) 470ms;
+}
+ .btninfo:hover .btninfo__bg__layer-third {
+	 transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1) 380ms, border-radius 0.2s cubic-bezier(0.19, 1, 0.22, 1) 670ms;
+}
+
+.btninfo__text-out, .btninfo__text-in {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: black;
+    z-index: 10;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    transition: transform 0.4s cubic-bezier(0.32, 0.99, 0.49, 0.99), opacity 0.4s;
+}
+
+.btninfo__text-out {
+    transform: translateY(0);
+    opacity: 1;
+}
+ .btninfo__text-in {
+	 opacity: 0;
+	 transform: translateY(33.333333%);
+}
+
+.btninfo:hover .btninfo__text-out {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.btninfo:hover .btninfo__text-in {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.btninfo__bg {
+    height: 100%;
+    width: 100%;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    background-color: var(--color-main-third);
+    border-radius: 20px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.btninfo__bg__layer {
+	 position: absolute;
+	 display: block;
+	 bottom: 0;
+	 left: 50%;
+	 translate: -50%;
+	 border-radius: 999rem 999rem 0 0;
+	 border: none;
+	 width: 120%;
+	 height: 200%;
+	 z-index: 20;
+	 transform: translateY(100%) translateX(0);
+}
+
+.btninfo__bg__layer-first {
+    background-color: var(--color-main);
+}
+
+.btninfo__bg__layer-second {
+    background-color: var(--color-main-second);
+}
+
+.btninfo__bg__layer-third {
+    background-color: var(--color-main-third);
+}
+
+.btninfo:hover .btninfo__bg__layer {
+    transform: translateY(0);
+    border-radius: 60% 60% 0 0;
+}

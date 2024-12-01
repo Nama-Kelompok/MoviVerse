@@ -21,6 +21,10 @@
         <link rel="stylesheet" href="static/main/css/style.css">
         <!-- Button style  -->
         <link rel="stylesheet" href="static/main/css/button.css">
+        <!-- Button style  -->
+        <link rel="stylesheet" href="static/main/css/buttoninfo.css">
+        <!-- Card style  -->
+        <link rel="stylesheet" href="static/main/css/card.css">
         <!-- Modernizr JS -->
         <script src="static/user/js/modernizr-2.6.2.min.js"></script>
 
@@ -102,35 +106,73 @@
             function renderMovies(movies) {
                 const moviesContainer = document.getElementById("moviesContainer");
                 moviesContainer.innerHTML = "";
-
+            
                 if (!movies || movies.length === 0) {
                     moviesContainer.innerHTML = "<p>No movies found.</p>";
                     return;
                 }
-
+            
                 movies.forEach(movie => {
+                    // Membuat elemen card
                     const movieCard = document.createElement("div");
-                    movieCard.classList.add("movie-card");
-
-                    const movieImage = movie.posterLink
-                        ? `<img src="${movie.posterLink}" alt="${movie.movieName}">`
-                        : `<div class="movie-placeholder">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                                </svg>
-                                <p>No Image Available</p>
-                        </div>`;
-
-                    movieCard.innerHTML = `
-                        ${movieImage}
-                        <h3>${movie.movieName}</h3>
-                        <a href="http://127.0.0.1:8000/movie/${movie.movieId}" target="_blank">More Info</a>
+                    movieCard.classList.add("card");
+            
+                    // Membuat elemen card-container
+                    const cardContainer = document.createElement("div");
+                    cardContainer.classList.add("card-container");
+            
+                    // Menambahkan gambar atau placeholder jika tidak ada
+                    if (movie.posterLink) {
+                        const movieImage = document.createElement("img");
+                        movieImage.src = movie.posterLink;
+                        movieImage.alt = movie.movieName;
+                        cardContainer.appendChild(movieImage);
+                    } else {
+                        const placeholder = document.createElement("div");
+                        placeholder.classList.add("movie-placeholder");
+                        placeholder.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                            </svg>
+                            <p>No Image Available</p>
+                        `;
+                        cardContainer.appendChild(placeholder);
+                    }
+            
+                    // Membuat elemen judul film
+                    const cardTitle = document.createElement("h3");
+                    cardTitle.textContent = movie.movieName;
+            
+                    // Membuat elemen tombol "More Info"
+                    const moreInfoButton = document.createElement("button");
+                    moreInfoButton.classList.add("btninfo");
+                    moreInfoButton.innerHTML = `
+                        <div class="btninfo__bg">
+                            <span class="btninfo__bg__layer btninfo__bg__layer-first"></span>
+                            <span class="btninfo__bg__layer btninfo__bg__layer-second"></span>
+                            <span class="btninfo__bg__layer btninfo__bg__layer-third"></span>
+                        </div>
+                        <span class="btninfo__text-out">More Info</span>
+                        <span class="btninfo__text-in">More Info</span>
                     `;
-
-
+            
+                    // Event listener untuk tombol "More Info"
+                    moreInfoButton.addEventListener("click", () => {
+                        window.location.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
+                    });
+            
+                    // Menambahkan elemen judul dan tombol ke dalam card-container
+                    cardContainer.appendChild(cardTitle);
+                    cardContainer.appendChild(moreInfoButton);
+            
+                    // Menambahkan card-container ke dalam card
+                    movieCard.appendChild(cardContainer);
+            
+                    // Menambahkan card ke dalam moviesContainer
                     moviesContainer.appendChild(movieCard);
                 });
             }
+            
 
             function updatePagination() {
                 document.getElementById("currentPage").textContent = `Page ${page}`;
