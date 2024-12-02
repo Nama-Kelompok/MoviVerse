@@ -52,26 +52,35 @@
         <div id="moviesContainer">
             <!-- Movie cards will appear here -->
         </div>
-
-        <div class="container">          
-            <div class="wrapper">
-                <button class="btn">
-                    <div class="btn__bg">
-                        <span class="btn__bg__layer btn__bg__layer-first"></span>
-                        <span class="btn__bg__layer btn__bg__layer-second"></span>
-                        <span class="btn__bg__layer btn__bg__layer-third"></span>
-                    </div>
-                    <span class="btn__text-out">See All Results</span>
-                    <span class="btn__text-in">See All Results</span>
-                </button>
+        
+        <div id="pagination">
+            <div class="container">
+                <div class="wrapper">
+                    <button class="btn" id="prevBtn" onclick="prev()" disabled>
+                        <div class="btn__bg">
+                            <span class="btn__bg__layer btn__bg__layer-first"></span>
+                            <span class="btn__bg__layer btn__bg__layer-second"></span>
+                            <span class="btn__bg__layer btn__bg__layer-third"></span>
+                        </div>
+                        <span class="btn__text-out">Prev</span>
+                        <span class="btn__text-in">Prev</span>
+                    </button>
+        
+                    <span id="currentPage" style="margin: 0 20px; font-size: 1.6rem; color: white;">Page 1</span>
+        
+                    <button class="btn" id="nextBtn" onclick="next()" disabled>
+                        <div class="btn__bg">
+                            <span class="btn__bg__layer btn__bg__layer-first"></span>
+                            <span class="btn__bg__layer btn__bg__layer-second"></span>
+                            <span class="btn__bg__layer btn__bg__layer-third"></span>
+                        </div>
+                        <span class="btn__text-out">Next</span>
+                        <span class="btn__text-in">Next</span>
+                    </button>
+                </div>
             </div>
         </div>
         
-        <div id="pagination">
-            <button id="prevBtn" onclick="prev()" disabled>Prev</button>
-            <span id="currentPage">Page 1</span>
-            <button id="nextBtn" onclick="next()" disabled>Next</button>
-        </div>
 
         <div class="gototop js-top">
             <a href="#" class="js-gotop"><i class="icon-arrow-up22"></i></a>
