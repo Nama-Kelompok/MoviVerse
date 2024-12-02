@@ -46,8 +46,8 @@
         <!-- Form Pencarian -->
         <div class="searchContainer">
             <input type="text" id="search" placeholder="Search for movies..." value="{{ search }}" />
-            <button type="button" class="search" aria-label="Search" onclick="fetchResult()"></button>
-        </div>
+            <button type="button" class="search" aria-label="Search" onclick="searchMovies()"></button>
+        </div>        
         
         <div id="moviesContainer">
             <!-- Movie cards will appear here -->
@@ -97,12 +97,20 @@
             
                     updatePagination();
                     renderMovies(data.movies);
-            
-                    // Hapus nilai input setelah pencarian
-                    searchInput.value = "";
                 } catch (error) {
                     console.error(error);
                     document.getElementById("moviesContainer").innerHTML = "<p>Error fetching data. Please try again later.</p>";
+                }
+            }
+
+            function searchMovies() {
+                const searchInput = document.getElementById("search");
+                const searchValue = searchInput.value.trim();
+        
+                if (searchValue) {
+                    window.location.href = `http://127.0.0.1:8000/main_search?search=${encodeURIComponent(searchValue)}`;
+                } else {
+                    alert("Please enter a search term.");
                 }
             }
             
