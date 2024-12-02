@@ -163,6 +163,14 @@ def get_movie_details(request, uri=None):
             else:
                 data_movie["director"] = "Tidak terdapat data director"
 
+            # Ambil label untuk Distributor
+            distributor_uri = data_movie.get("distributor", "")
+            if distributor_uri.startswith("http://"):
+                distributor_label = fetch_label(distributor_uri)
+                data_movie["distributor"] = distributor_label
+            else:
+                data_movie["distributor"] = "Tidak terdapat data distributor"
+
             running_time = data_movie.get("runningTime", "")
             if running_time and running_time.isdigit():  
                 total_minutes = int(running_time)
