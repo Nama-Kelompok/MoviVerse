@@ -21,8 +21,10 @@
         <link rel="stylesheet" href="static/main/css/style.css">
         <!-- Button style  -->
         <link rel="stylesheet" href="static/main/css/button.css">
-        <!-- Button style  -->
+        <!-- Button Info style  -->
         <link rel="stylesheet" href="static/main/css/buttoninfo.css">
+        <!-- Search Bar style  -->
+        <link rel="stylesheet" href="static/main/css/searchbar.css">
         <!-- Card style  -->
         <link rel="stylesheet" href="static/main/css/card.css">
         <!-- Modernizr JS -->
@@ -32,28 +34,19 @@
     
     <body>
         <div class="moviverse-loader"></div>
-        <div id="page">
         
         <header id="moviverse-header">
             <div class="container">
-                <div class="row">
-                    <div class="display-tc animate-box" data-animate-effect="fadeIn">
-                        <h1><em>Movie Search</em> </h1>
-                    </div>
+                <div class="display-tc animate-box" data-animate-effect="fadeIn">
+                    <h1>Movie Search</h1>
                 </div>
             </div>
         </header>
 
         <!-- Form Pencarian -->
-        <form id="searchForm" onsubmit="event.preventDefault(); fetchResult();">
+        <div class="searchContainer" onsubmit="event.preventDefault(); fetchResult();">
             <input type="text" id="search" placeholder="Search for movies..." value="{{ search }}" />
-            <button type="submit">Search</button>
-        </form>
-
-        <div id="pagination">
-            <button id="prevBtn" onclick="prev()" disabled>Prev</button>
-            <span id="currentPage">Page 1</span>
-            <button id="nextBtn" onclick="next()" disabled>Next</button>
+            <button type="submit" class="search" aria-label="Search"></button>
         </div>
 
         <div id="moviesContainer">
@@ -74,6 +67,12 @@
             </div>
         </div>
         
+        <div id="pagination">
+            <button id="prevBtn" onclick="prev()" disabled>Prev</button>
+            <span id="currentPage">Page 1</span>
+            <button id="nextBtn" onclick="next()" disabled>Next</button>
+        </div>
+
         <div class="gototop js-top">
             <a href="#" class="js-gotop"><i class="icon-arrow-up22"></i></a>
         </div>

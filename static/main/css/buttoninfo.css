@@ -2,7 +2,7 @@
  :root {
 	 --color-main: #a474ff;
 	 --color-main-second: #17f1d1;
-	 --color-main-third: #ece1df;
+	 --color-main-third: crimson;
 }
 
 .btninfo {
@@ -45,7 +45,7 @@
 	 transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1) 380ms, border-radius 0.2s cubic-bezier(0.19, 1, 0.22, 1) 670ms;
 }
 
-.btninfo__text-out, .btninfo__text-in {
+.btninfo__text-out {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,6 +55,21 @@
     font-weight: 700;
     font-size: 1.6rem;
     color: black;
+    z-index: 10;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    transition: transform 0.4s cubic-bezier(0.32, 0.99, 0.49, 0.99), opacity 0.4s;
+}
+
+.btninfo__text-in {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: rgb(255, 255, 255);
     z-index: 10;
     font-family: "Cormorant Garamond", Georgia, serif;
     transition: transform 0.4s cubic-bezier(0.32, 0.99, 0.49, 0.99), opacity 0.4s;
@@ -83,7 +98,7 @@
     height: 100%;
     width: 100%;
     transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    background-color: var(--color-main-third);
+    background-color: beige;
     border-radius: 20px;
     overflow: hidden;
     position: absolute;
