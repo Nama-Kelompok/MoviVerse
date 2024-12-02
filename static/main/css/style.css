@@ -21,12 +21,6 @@ body {
     }
 }
 
-#moviverse-header .display-tc h1{
-  color: white;
-  font-style: normal;
-  font-family: serif;
-}
-
 .gototop {
     position: fixed;
     bottom: 20px;
@@ -77,11 +71,6 @@ a:hover, a:active, a:focus {
     color: #ea272d;
     outline: none;
     text-decoration: none;
-}
-
-p {
-    margin-bottom: 30px;
-    font-style: 18px;
 }
 
 ::-webkit-selection {

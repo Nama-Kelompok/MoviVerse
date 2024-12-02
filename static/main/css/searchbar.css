@@ -1,5 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=Inconsolata:700');
 
+#search-section {
+  margin-top: 10%; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1000; 
+}
+
 .searchContainer {
   position: relative;
   margin: auto;

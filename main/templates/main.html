@@ -27,27 +27,38 @@
         <link rel="stylesheet" href="static/main/css/searchbar.css">
         <!-- Card style  -->
         <link rel="stylesheet" href="static/main/css/card.css">
+        <!-- Navbar style  -->
+        <link rel="stylesheet" href="static/main/css/navbar.css">
         <!-- Modernizr JS -->
         <script src="static/user/js/modernizr-2.6.2.min.js"></script>
-
 	</head>
     
     <body>
         <div class="moviverse-loader"></div>
-        
-        <header id="moviverse-header">
-            <div class="container">
-                <div class="display-tc animate-box" data-animate-effect="fadeIn">
-                    <h1>Movie Search</h1>
+        <!-- Navbar -->
+        <nav class="moviverse-nav" role="navigation">
+            <div class="navcontainer">
+                <div class="row">
+                    <!-- Logo -->
+                    <div class="col-xs-12 text-center logo-wrap" id="moviverse-logo">
+                        <a>Movi Search</a>
+                    </div>
+                    <!-- Menu -->
+                    <div class="col-xs-12 text-center menu-1 menu-wrap">
+                        <ul>
+                            <li><a href="{% url 'main:landing_page'%}">Home</a></li>
+                            <li class="active"><a href="{% url 'main:main_page'%}">Search</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </header>
+        </nav>
 
         <!-- Form Pencarian -->
-        <div class="searchContainer">
+        <div id="search-section" class="searchContainer">
             <input type="text" id="search" placeholder="Search for movies..." value="{{ search }}" />
             <button type="button" class="search" aria-label="Search" onclick="searchMovies()"></button>
-        </div>        
+        </div>     
         
         <div id="moviesContainer">
             <!-- Movie cards will appear here -->
@@ -115,12 +126,7 @@
             function searchMovies() {
                 const searchInput = document.getElementById("search");
                 const searchValue = searchInput.value.trim();
-        
-                if (searchValue) {
-                    window.location.href = `http://127.0.0.1:8000/main_search?search=${encodeURIComponent(searchValue)}`;
-                } else {
-                    alert("Please enter a search term.");
-                }
+                window.location.href = `http://127.0.0.1:8000/main_search?search=${encodeURIComponent(searchValue)}`;
             }
             
             function renderMovies(movies) {
