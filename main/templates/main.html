@@ -27,51 +27,71 @@
         <link rel="stylesheet" href="static/main/css/searchbar.css">
         <!-- Card style  -->
         <link rel="stylesheet" href="static/main/css/card.css">
+        <!-- Navbar style  -->
+        <link rel="stylesheet" href="static/main/css/navbar.css">
         <!-- Modernizr JS -->
         <script src="static/user/js/modernizr-2.6.2.min.js"></script>
-
 	</head>
     
     <body>
         <div class="moviverse-loader"></div>
-        
-        <header id="moviverse-header">
-            <div class="container">
-                <div class="display-tc animate-box" data-animate-effect="fadeIn">
-                    <h1>Movie Search</h1>
+        <!-- Navbar -->
+        <nav class="moviverse-nav" role="navigation">
+            <div class="navcontainer">
+                <div class="row">
+                    <!-- Logo -->
+                    <div class="col-xs-12 text-center logo-wrap" id="moviverse-logo">
+                        <a>Movi Search</a>
+                    </div>
+                    <!-- Menu -->
+                    <div class="col-xs-12 text-center menu-1 menu-wrap">
+                        <ul>
+                            <li><a href="{% url 'main:landing_page'%}">Home</a></li>
+                            <li class="active"><a href="{% url 'main:main_page'%}">Search</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </header>
+        </nav>
 
         <!-- Form Pencarian -->
-        <div class="searchContainer">
+        <div id="search-section" class="searchContainer">
             <input type="text" id="search" placeholder="Search for movies..." value="{{ search }}" />
-            <button type="button" class="search" aria-label="Search" onclick="fetchResult()"></button>
-        </div>
+            <button type="button" class="search" aria-label="Search" onclick="searchMovies()"></button>
+        </div>     
         
         <div id="moviesContainer">
             <!-- Movie cards will appear here -->
         </div>
-
-        <div class="container">          
-            <div class="wrapper">
-                <button class="btn">
-                    <div class="btn__bg">
-                        <span class="btn__bg__layer btn__bg__layer-first"></span>
-                        <span class="btn__bg__layer btn__bg__layer-second"></span>
-                        <span class="btn__bg__layer btn__bg__layer-third"></span>
-                    </div>
-                    <span class="btn__text-out">See All Results</span>
-                    <span class="btn__text-in">See All Results</span>
-                </button>
+        
+        <div id="pagination">
+            <div class="container">
+                <div class="wrapper">
+                    <button class="btn" id="prevBtn" onclick="prev()" disabled>
+                        <div class="btn__bg">
+                            <span class="btn__bg__layer btn__bg__layer-first"></span>
+                            <span class="btn__bg__layer btn__bg__layer-second"></span>
+                            <span class="btn__bg__layer btn__bg__layer-third"></span>
+                        </div>
+                        <span class="btn__text-out">Prev</span>
+                        <span class="btn__text-in">Prev</span>
+                    </button>
+        
+                    <span id="currentPage" style="margin: 10px 28px 30px 28px; font-size: 1.6rem; color: white;">Page 1</span>
+        
+                    <button class="btn" id="nextBtn" onclick="next()" disabled>
+                        <div class="btn__bg">
+                            <span class="btn__bg__layer btn__bg__layer-first"></span>
+                            <span class="btn__bg__layer btn__bg__layer-second"></span>
+                            <span class="btn__bg__layer btn__bg__layer-third"></span>
+                        </div>
+                        <span class="btn__text-out">Next</span>
+                        <span class="btn__text-in">Next</span>
+                    </button>
+                </div>
             </div>
         </div>
         
-        <div id="pagination">
-            <button id="prevBtn" onclick="prev()" disabled>Prev</button>
-            <span id="currentPage">Page 1</span>
-            <button id="nextBtn" onclick="next()" disabled>Next</button>
-        </div>
 
         <div class="gototop js-top">
             <a href="#" class="js-gotop"><i class="icon-arrow-up22"></i></a>
@@ -97,13 +117,16 @@
             
                     updatePagination();
                     renderMovies(data.movies);
-            
-                    // Hapus nilai input setelah pencarian
-                    searchInput.value = "";
                 } catch (error) {
                     console.error(error);
                     document.getElementById("moviesContainer").innerHTML = "<p>Error fetching data. Please try again later.</p>";
                 }
+            }
+
+            function searchMovies() {
+                const searchInput = document.getElementById("search");
+                const searchValue = searchInput.value.trim();
+                window.location.href = `http://127.0.0.1:8000/main_search?search=${encodeURIComponent(searchValue)}`;
             }
             
             function renderMovies(movies) {

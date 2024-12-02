@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'icomoon';
+    src: url("../../user/fonts/icomoon/icomoon.eot?srf3rx");
+    src: url("../../user/fonts/icomoon/icomoon.eot?srf3rx#iefix") format("embedded-opentype"), url("../../user/fonts/icomoon/icomoon.ttf?srf3rx") format("truetype"), url("../../user/fonts/icomoon/icomoon.woff?srf3rx") format("woff"), url("../../user/fonts/icomoon/icomoon.svg?srf3rx#icomoon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     font-family: Georgia, serif;
     font-weight: 40px;
@@ -11,12 +19,6 @@ body {
     body {
       background: #000 url(../../user/images/broken_noise.png) repeat;
     }
-}
-
-#moviverse-header .display-tc h1{
-  color: white;
-  font-style: normal;
-  font-family: serif;
 }
 
 .gototop {
@@ -71,11 +73,6 @@ a:hover, a:active, a:focus {
     text-decoration: none;
 }
 
-p {
-    margin-bottom: 30px;
-    font-style: 18px;
-}
-
 ::-webkit-selection {
     color: #fff;
     background: #ea272d;
@@ -89,27 +86,6 @@ p {
 ::selection {
     color: #fff;
     background: #ea272d;
-}
-
-#pagination {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-#pagination button {
-    padding: 10px 20px;
-    margin: 0 5px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#pagination button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
 }
 
 #moviesContainer {

@@ -1,5 +1,5 @@
 .container {
-    padding-top: 1%;
+    padding-top: 5%;
     padding-bottom: 1%;
     display: flex;
     justify-content: center;
@@ -15,11 +15,11 @@
 
 .btn {
     display: inline-block;
-    height: 60px;
-    width: 180px;
+    height: 50px;
+    width: 120px;
     position: relative;
     border: none;
-    border-radius: 50px;
+    border-radius: 20px;
     cursor: pointer;
     overflow: hidden;
     background-color: transparent;
@@ -109,14 +109,15 @@
     height: 100%;
     width: 100%;
     transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    background-color: beige;
-    border-radius: 50px;
+    background-color: rgb(112, 110, 254);
+    border-radius: 20px;
     overflow: hidden;
     position: absolute;
     top: 0;
     left: 0;
 }
- .btn__bg__layer {
+
+.btn__bg__layer {
 	 position: absolute;
 	 display: block;
 	 bottom: 0;
@@ -145,4 +146,13 @@
 .btn:hover .btn__bg__layer {
     transform: translateY(0);
     border-radius: 60% 60% 0 0;
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn:disabled .btn__bg {
+    background-color: #ccc;
 }
