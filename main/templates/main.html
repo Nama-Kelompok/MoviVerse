@@ -44,11 +44,11 @@
         </header>
 
         <!-- Form Pencarian -->
-        <div class="searchContainer" onsubmit="event.preventDefault(); fetchResult();">
+        <div class="searchContainer">
             <input type="text" id="search" placeholder="Search for movies..." value="{{ search }}" />
-            <button type="submit" class="search" aria-label="Search"></button>
+            <button type="button" class="search" aria-label="Search" onclick="fetchResult()"></button>
         </div>
-
+        
         <div id="moviesContainer">
             <!-- Movie cards will appear here -->
         </div>
@@ -83,25 +83,29 @@
             let hasNext = false;
 
             async function fetchResult() {
-                const searchInput = document.getElementById("search").value.trim();
-                movie = searchInput || movie;
-
+                const searchInput = document.getElementById("search");
+                const searchValue = searchInput.value.trim(); 
+                movie = searchValue || movie;
+            
                 const url = "{% url 'main:search_movie' %}?page=" + page + "&movie=" + movie;
                 try {
                     const response = await fetch(url);
                     if (!response.ok) throw new Error("Failed to fetch data");
-
+            
                     const data = await response.json();
                     hasNext = data.hasNextPage;
-
+            
                     updatePagination();
                     renderMovies(data.movies);
+            
+                    // Hapus nilai input setelah pencarian
+                    searchInput.value = "";
                 } catch (error) {
                     console.error(error);
                     document.getElementById("moviesContainer").innerHTML = "<p>Error fetching data. Please try again later.</p>";
                 }
             }
-
+            
             function renderMovies(movies) {
                 const moviesContainer = document.getElementById("moviesContainer");
                 moviesContainer.innerHTML = "";
