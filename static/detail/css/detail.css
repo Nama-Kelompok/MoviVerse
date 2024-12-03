@@ -25,7 +25,7 @@ ul:not(:last-child) {
 
 p,
 li {
-  font-size: 0.9em;
+  font-size: 1.2em;
   line-height: 1.5;
 }
 
@@ -86,7 +86,7 @@ strong {
 }
 
 .movie__tags {
-  font-size: 0.75em;
+  font-size: 1em;
   color: darkgray;
 }
 
@@ -161,12 +161,12 @@ strong {
 
 .movie__details {
   flex: 1;
-  padding: 24px; /* 12px * 2 */
+  margin-top: 5%; 
 }
 
 @media (min-width: 600px) {
   .movie__details {
-    padding: 72px; /* 12px * 6 */
+    padding: 72px;
   }
 }
 
