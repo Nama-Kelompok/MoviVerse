@@ -65,7 +65,18 @@
                     </ul>
 
                     <p class="movie__plot">{{movie.information}}</p>
-
+                    <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
+                    <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
+                    <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
+                    <p>
+                        <span class="bold">Wikidata URI:</span>
+                        {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
+                            <a href="{{ movie.wikidataUri }}" target="_blank" class="text-primary">{{ movie.wikidataUri }}</a>
+                        {% else %}
+                            {{ movie.wikidataUri }}
+                        {% endif %}
+                    </p>
+                    
                     <h3>Distributed by:</h3>
                     <div class="movie__credits">
                         <ul class="movie__distributors list--inline">
@@ -121,18 +132,6 @@
                         </li>
                         {% endfor %}
                     </ul>
-
-                    <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
-                    <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
-                    <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
-                    <p>
-                        <span class="bold">Wikidata URI:</span>
-                        {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
-                            <a href="{{ movie.wikidataUri }}" target="_blank" class="text-primary">{{ movie.wikidataUri }}</a>
-                        {% else %}
-                            {{ movie.wikidataUri }}
-                        {% endif %}
-                    </p>
                 </div>
             </div>
         </div>
