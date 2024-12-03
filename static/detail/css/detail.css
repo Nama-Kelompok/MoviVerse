@@ -1,17 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Lato:400,900');
 
-* {
-  box-sizing: border-box;
-}
-
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  min-height: 100vh;
-  font-family: 'Lato', sans-serif;
-  background-color: whitesmoke;
+    font-family: 'Lato', sans-serif;
+    font-weight: 40px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.3);
+    background: #000 url(../../user/images/broken_noise.png) repeat;
 }
 
 h1,
@@ -44,14 +39,6 @@ strong {
   font-weight: 900;
 }
 
-input {
-  padding: 6px;
-  font-family: 'Lato', sans-serif;
-  font-size: 16px;
-  border: 1px solid gainsboro;
-  border-radius: 2px;
-}
-
 .list--inline li {
   display: inline-block;
 }
@@ -61,14 +48,13 @@ input {
 }
 
 .movie {
+  margin-top: 10%; 
+  background: #000 url(../../user/images/broken_noise.png) repeat;
   position: relative;
   overflow: hidden;
-  margin: 12px auto;
+  margin: 0;
   width: 100%;
-  max-width: 800px;
-  background-color: white;
-  border-radius: 0.8em;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 30px 18px -24px;
+  z-index: 1000; 
 }
 
 .movie__data {
@@ -76,7 +62,7 @@ input {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 400px; /* 200px * 2 */
+  min-height: 400px; 
 }
 
 @media (min-width: 600px) {

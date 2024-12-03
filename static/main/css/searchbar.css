@@ -9,6 +9,12 @@
   z-index: 1000; 
 }
 
+@media (max-width: 1000px) {
+  #search-section {
+    margin-top: 15%;
+  }
+}
+
 .searchContainer {
   position: relative;
   margin: auto;

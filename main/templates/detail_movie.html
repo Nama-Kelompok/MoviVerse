@@ -15,129 +15,61 @@
         <link rel="stylesheet" href="{% static 'user/css/icomoon.css' %}">
         <link rel="stylesheet" href="{% static 'user/css/bootstrap.css' %}">
         <link rel="stylesheet" href="{% static 'user/css/flexslider.css' %}">
-        <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
-        <link rel="stylesheet" href="{% static 'main/css/button.css' %}">
         <link rel="stylesheet" href="{% static 'detail/css/detail.css' %}">
-
-        <style>
-            body {
-                font-family: 'Cormorant Garamond', serif;
-                background-color: #2c3e50;
-                color: #ecf0f1;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 100vh;
-            }
-
-            .container {
-                background: #fff;
-                color: #2c3e50;
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                max-width: 1200px;
-                width: 90%;
-            }
-
-            .movie-poster img {
-                max-width: 100%;
-                height: auto;
-                max-height: 450px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            }
-
-            .movie-details h1 {
-                font-family: 'Cormorant Garamond', serif;
-                font-weight: bold;
-                font-size: 28px;
-                color: #2c3e50;
-            }
-
-            .movie-details h1 a {
-                text-decoration: none;
-                color: #2c3e50;
-            }
-
-            .movie-details h1 a:hover {
-                color: #3498db;
-            }
-
-            .movie-details p {
-                font-size: 16px;
-                color: #34495e;
-                margin-bottom: 10px;
-            }
-
-            .movie-details .bold {
-                font-weight: bold;
-            }
-
-            ul.list-unstyled {
-                padding-left: 0;
-            }
-
-            ul.list-unstyled li {
-                font-size: 16px;
-                color: #2c3e50;
-                margin-bottom: 10px;
-            }
-
-            ul.list-unstyled li a {
-                color: #3498db;
-                text-decoration: none;
-            }
-
-            ul.list-unstyled li a:hover {
-                text-decoration: underline;
-            }
-        </style>
+        <!-- Navbar style  -->
+        <link rel="stylesheet" href="{% static 'main/css/navbar.css' %}">
     </head>
+    
     <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-5 text-center mb-4">
-                    <div class="movie-poster">
-                        <img src="{{ movie.photoUrl }}" alt="{{ movie.title }}">
-                    </div>
-                </div>
-
-                <div class="col-lg-8 col-md-7">
-                    <div class="movie-details">
-                        <h1>
-                            {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
-                                <a href="{{ movie.wikidataUri }}" target="_blank">{{ movie.title }} ({{ movie.releaseYear }})</a>
-                            {% else %}
-                                {{ movie.title }} ({{ movie.releaseYear }})
-                            {% endif %}
-                        </h1>
-                        <p><span class="bold">Director:</span> {{ movie.director }}</p>
-                        <p><span class="bold">Distributor:</span> {{ movie.distributor }}</p>
-                        <p><span class="bold">Genres:</span> {{ movie.genres }}</p>
-                        <p><span class="bold">IMDb Rating:</span> {{ movie.rating }}</p>
-                        <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
-                        <p><span class="bold">Running Time:</span> {{ movie.runningTime }}</p>
-                        <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
-                        <p>
-                            <span class="bold">Wikidata URI:</span>
-                            {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
-                                <a href="{{ movie.wikidataUri }}" target="_blank" class="text-danger">{{ movie.wikidataUri }}</a>
-                            {% else %}
-                                {{ movie.wikidataUri }}
-                            {% endif %}
-                        </p>
-                        <p><span class="bold">Information:</span> {{ movie.information }}</p>
+        <!-- Navbar -->
+        <nav class="moviverse-nav" role="navigation">
+            <div class="navcontainer">
+                <div class="row">
+                    <!-- Menu -->
+                    <div class="col-xs-12 text-center menu-1 menu-wrap">
+                        <ul>
+                            <li><a href="{% url 'main:landing_page'%}">Home</a></li>
+                            <li class="active"><a href="{% url 'main:main_page'%}">Search</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
+        </nav>
+        
+        <div class="movie">
+            <div class="movie__data">
+                <div class="movie__poster">
+                    <span class="movie__poster--fill">
+                        <img src="{{ movie.photoUrl }}" alt="{{ movie.title }}">
+                    </span>
+                    <span class="movie__poster--featured">
+                        <img src="{{ movie.photoUrl }}" alt="{{ movie.title }}"/>
+                        </span>
+                </div>
 
-            <div class="row mt-5">
-                <div class="col-12">
-                    <h2 class="text-dark">Stars</h2>
-                    <ul class="list-unstyled">
-                        {% for star in movie.stars %}
+                <div class="movie__details">
+                    <h2 class="movie__title">
+                        {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
+                            <a href="{{ movie.wikidataUri }}" target="_blank">{{ movie.title }} ({{ movie.releaseYear }})</a>
+                        {% else %}
+                            {{ movie.title }} ({{ movie.releaseYear }})
+                        {% endif %}
+                    </h2>
+
+                    <ul class="movie__tags list--inline">
+                        <li class="movie__rated">{{ movie.rating }}</li>
+                        <li class="movie__year">{{movie.releaseYear}}</li>
+                        <li class="movie__year">{{ movie.genres }}</li>
+                    </ul>
+
+                    <p class="movie__plot">{{movie.information}}</p>
+
+                    <div class="movie__credits">
+                        <p><strong>Distributed by:</strong> {{ movie.distributor }}</p>
+                        <p><strong>Directed by:</strong> {{ movie.director }}</p>
+                        <p><strong>Starring:</strong></p>
+                        <ul class="movie__actors list--inline">
+                            {% for star in movie.stars %}
                             <li>
                                 {% if star.1 %}
                                     <a href="{{ star.1 }}" target="_blank" class="text-primary">{{ star.0 }}</a>
@@ -145,8 +77,21 @@
                                     {{ star.0 }}
                                 {% endif %}
                             </li>
-                        {% endfor %}
-                    </ul>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
+                    <p><span class="bold">Running Time:</span> {{ movie.runningTime }}</p>
+                    <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
+                    <p>
+                        <span class="bold">Wikidata URI:</span>
+                        {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
+                            <a href="{{ movie.wikidataUri }}" target="_blank" class="text-primary">{{ movie.wikidataUri }}</a>
+                        {% else %}
+                            {{ movie.wikidataUri }}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
