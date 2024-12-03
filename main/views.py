@@ -81,15 +81,14 @@ def get_movie_data(request, id):
     context = {"id": id}
     return JsonResponse(context)
 
-def fetch_star_image(uri):
+def fetch_image(uri):
     """
-    Fetch star image URL from Wikidata using P18 property.
+    Fetch image URL from Wikidata using P18 property.
     """
-    print(uri)
     sparql_query = f"""
     SELECT ?image WHERE {{
-        BIND(<{uri}> AS ?star) .
-        ?star wdt:P18 ?image .
+        BIND(<{uri}> AS ?entity) .
+        ?entity wdt:P18 ?image .
     }}
     """
     sparql.setQuery(sparql_query)
@@ -99,8 +98,7 @@ def fetch_star_image(uri):
         results = sparql.query().convert()
         if results["results"]["bindings"]:
             # Extract the Wikimedia Commons file link
-            commons_file_url = results["results"]["bindings"][0]["image"]["value"]
-            return commons_file_url
+            return results["results"]["bindings"][0]["image"]["value"]
         else:
             print(f"No image found for {uri}")
             return None
@@ -109,8 +107,6 @@ def fetch_star_image(uri):
         return None
     
 def get_movie_details(request, uri=None):
-    print("Mengambil detail film untuk URI:", uri)
-
     if not uri.startswith("http://"):
         uri = f"http://nama-kelompok.org/data/{uri}"
 
@@ -180,25 +176,38 @@ def get_movie_details(request, uri=None):
                     if ("error" in uri_star):
                         data_movie["stars"].append([star_label, None, None])
                     else:
-                        star_image = fetch_star_image(uri_star)
-                        print(star_image)
+                        star_image = fetch_image(uri_star)
                         data_movie["stars"].append([star_label, uri_star, star_image])                        
 
-            # Ambil label untuk director
-            director_uri = data_movie.get("director", "")
-            if director_uri.startswith("http://"):
-                director_label = fetch_label(director_uri)
-                data_movie["director"] = director_label
-            else:
-                data_movie["director"] = "Tidak terdapat data director"
-
-            # Ambil label untuk Distributor
             distributor_uri = data_movie.get("distributor", "")
             if distributor_uri.startswith("http://"):
                 distributor_label = fetch_label(distributor_uri)
-                data_movie["distributor"] = distributor_label
+                uri_distributor = fetch_distributor_uri(data_movie["wikidataUri"], distributor_label)
+                print(distributor_uri)
+                distributor_image = fetch_image(uri_distributor)
+                data_movie["distributor"] = {
+                    "label": distributor_label,
+                    "image": distributor_image,
+                    "uri": uri_distributor,
+                }
             else:
-                data_movie["distributor"] = "Tidak terdapat data distributor"
+                data_movie["distributor"] = {"label": "Tidak terdapat data distributor", "image": None, "uri": None}
+
+
+            director_uri = data_movie.get("director", "")
+            if director_uri.startswith("http://"):
+                director_label = fetch_label(director_uri)
+                uri_director = fetch_director_uri(data_movie["wikidataUri"], director_label)
+                print(uri_director)
+                director_image = fetch_image(uri_director)
+                data_movie["director"] = {
+                    "label": director_label,
+                    "image": director_image,
+                    "uri": uri_director,
+                }
+            else:
+                data_movie["director"] = {"label": "Tidak terdapat data director", "image": None, "uri": None}
+
 
             running_time = data_movie.get("runningTime", "")
             if running_time and running_time.isdigit():  
@@ -242,7 +251,6 @@ def fetch_label(uri):
 
 def fetch_cast_uri(uri, nama):
     uriid = uri.split("/")[-1]
-
     sparql_query = f"""
                 PREFIX wd: <http://www.wikidata.org/entity/>
                 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -265,3 +273,61 @@ def fetch_cast_uri(uri, nama):
 
     except Exception as e:
         return {"error": str(e)}
+    
+def fetch_director_uri(uri, nama):
+    """
+    Fetch director URI from Wikidata using movie URI and director's name.
+    """
+    uriid = uri.split("/")[-1]
+    sparql_query = f"""
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+    SELECT DISTINCT ?director WHERE {{
+        wd:{uriid} wdt:P57 ?director .
+        ?director rdfs:label ?nama .
+        FILTER(?nama = "{nama}"@en)
+    }} LIMIT 1
+    """
+    sparql.setQuery(sparql_query)
+
+    try:
+        results = sparql.query().convert()
+        if results["results"]["bindings"]:
+            return results["results"]["bindings"][0]["director"]["value"]
+        else:
+            print(f"No director URI found for {nama}")
+            return None
+    except Exception as e:
+        print(f"Error fetching director URI for {nama}: {e}")
+        return None
+
+def fetch_distributor_uri(uri, nama):
+    """
+    Fetch distributor URI from Wikidata using movie URI and distributor's name.
+    """
+    uriid = uri.split("/")[-1]
+    sparql_query = f"""
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+    SELECT DISTINCT ?distributor WHERE {{
+        wd:{uriid} wdt:P750 ?distributor .
+        ?distributor rdfs:label ?nama .
+        FILTER(?nama = "{nama}"@en)
+    }} LIMIT 1
+    """
+    sparql.setQuery(sparql_query)
+
+    try:
+        results = sparql.query().convert()
+        if results["results"]["bindings"]:
+            return results["results"]["bindings"][0]["distributor"]["value"]
+        else:
+            print(f"No distributor URI found for {nama}")
+            return None
+    except Exception as e:
+        print(f"Error fetching distributor URI for {nama}: {e}")
+        return None

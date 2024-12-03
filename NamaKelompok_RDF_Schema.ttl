@@ -1,0 +1,205 @@
+@prefix : <http://nama-kelompok.org/vocab/> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://nama-kelompok.org/vocab/> .
+
+<http://nama-kelompok.org/vocab> rdf:type owl:Ontology .
+
+#################################################################
+#    Datatypes
+#################################################################
+
+###  http://www.w3.org/2001/XMLSchema#date
+xsd:date rdf:type rdfs:Datatype .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://nama-kelompok.org/vocab#director
+:director rdf:type owl:ObjectProperty ;
+          rdfs:domain :Movie ;
+          rdfs:range :Director ;
+          rdfs:comment "Person who directed a movie" .
+
+
+###  http://nama-kelompok.org/vocab#distributor
+:distributor rdf:type owl:ObjectProperty ;
+             rdfs:domain :Movie ;
+             rdfs:range :Distributor .
+
+
+###  http://nama-kelompok.org/vocab#star
+:star rdf:type owl:ObjectProperty ;
+      rdfs:domain :Movie ;
+      rdfs:range :Actor ;
+      rdfs:comment "Person/actor who stars in a movie" .
+
+
+###  http://nama-kelompok.org/vocab#wikidataUri
+:wikidataUri rdf:type owl:ObjectProperty ;
+             rdfs:domain :Movie ;
+             rdfs:range wd:Q11424 ;
+             rdfs:comment "Relation that connects an entity to its equivalent wikidata entity" .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://nama-kelompok.org/vocab#Genre
+:Genre rdf:type owl:DatatypeProperty ;
+       rdfs:domain :Movie ;
+       rdfs:range xsd:string ;
+       rdfs:comment "Stylistic categories that organize films based on criteria such as the setting, characters, plot, mood, tone, and theme" .
+
+
+###  http://nama-kelompok.org/vocab#budget
+:budget rdf:type owl:DatatypeProperty ;
+        rdfs:domain :Movie ;
+        rdfs:range xsd:integer ;
+        rdfs:comment "A movie's budget (in $)" .
+
+
+###  http://nama-kelompok.org/vocab#certificate
+:certificate rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Movie ;
+             rdfs:range xsd:string ;
+             rdfs:comment "Certificate earned by that movie" .
+
+
+###  http://nama-kelompok.org/vocab#domesticOpening
+:domesticOpening rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Movie ;
+                 rdfs:range xsd:integer ;
+                 rdfs:comment "The gross revenue a movie makes in North America (the United States, Canada, and Puerto Rico) during its first few days in theaters (in $)" .
+
+
+###  http://nama-kelompok.org/vocab#domesticSales
+:domesticSales rdf:type owl:DatatypeProperty ;
+               rdfs:domain :Movie ;
+               rdfs:range xsd:integer ;
+               rdfs:comment "A movie's gross box office revenue from North America (in $)" .
+
+
+###  http://nama-kelompok.org/vocab#gross
+:gross rdf:type owl:DatatypeProperty ;
+       rdfs:domain :Movie ;
+       rdfs:range xsd:integer ;
+       rdfs:comment "Money earned by a movie" .
+
+
+###  http://nama-kelompok.org/vocab#imdbRating
+:imdbRating rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Movie ;
+            rdfs:range xsd:float ;
+            rdfs:comment "Rating of a movie given by IMDB" .
+
+
+###  http://nama-kelompok.org/vocab#internationalSales
+:internationalSales rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :Movie ;
+                    rdfs:range xsd:integer ;
+                    rdfs:comment "Revenue made outside of North America (in $)" .
+
+
+###  http://nama-kelompok.org/vocab#license
+:license rdf:type owl:DatatypeProperty ;
+         rdfs:domain :Movie ;
+         rdfs:range xsd:string ;
+         rdfs:comment "Descriptions that indicate the level of maturity of a film's content and the age range of audiences for which it is intended" .
+
+
+###  http://nama-kelompok.org/vocab#metaScore
+:metaScore rdf:type owl:DatatypeProperty ;
+           rdfs:domain :Movie ;
+           rdfs:range xsd:integer ;
+           rdfs:comment "Rating of a movie given by Metacritic" .
+
+
+###  http://nama-kelompok.org/vocab#movieInfo
+:movieInfo rdf:type owl:DatatypeProperty ;
+           rdfs:domain :Movie ;
+           rdfs:range xsd:string ;
+           rdfs:comment "Brief introduction of a movie" .
+
+
+###  http://nama-kelompok.org/vocab#posterLink
+:posterLink rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Movie ;
+            rdfs:range xsd:anyURI ;
+            rdfs:comment "Link to the poster that is used by IMDB" .
+
+
+###  http://nama-kelompok.org/vocab#releaseDate
+:releaseDate rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Movie ;
+             rdfs:range xsd:date ;
+             rdfs:comment "Release date of a movie" .
+
+
+###  http://nama-kelompok.org/vocab#releaseYear
+:releaseYear rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Movie ;
+             rdfs:range xsd:integer ;
+             rdfs:comment "The year at which a movie released" .
+
+
+###  http://nama-kelompok.org/vocab#runningTime
+:runningTime rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Movie ;
+             rdfs:range xsd:integer ;
+             rdfs:comment "Total running time of a movie in minutes" .
+
+
+###  http://nama-kelompok.org/vocab#votes
+:votes rdf:type owl:DatatypeProperty ;
+       rdfs:domain :Movie ;
+       rdfs:range xsd:integer ;
+       rdfs:comment "Total number of votes" .
+
+
+###  http://nama-kelompok.org/vocab#worldWideSales
+:worldWideSales rdf:type owl:DatatypeProperty ;
+                rdfs:domain :Movie ;
+                rdfs:range xsd:integer ;
+                rdfs:comment "Revenue of a movie both domestically and internationally (in $)" .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://nama-kelompok.org/vocab#Actor
+:Actor rdf:type owl:Class ;
+       rdfs:subClassOf :Person .
+
+
+###  http://nama-kelompok.org/vocab#Director
+:Director rdf:type owl:Class ;
+          rdfs:subClassOf :Person .
+
+
+###  http://nama-kelompok.org/vocab#Distributor
+:Distributor rdf:type owl:Class .
+
+
+###  http://nama-kelompok.org/vocab#Movie
+:Movie rdf:type owl:Class .
+
+
+###  http://nama-kelompok.org/vocab#Person
+:Person rdf:type owl:Class .
+
+
+###  http://www.wikidata.org/entity/Q11424
+wd:Q11424 rdf:type owl:Class ;
+          rdfs:comment "Wikidata entity" .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi

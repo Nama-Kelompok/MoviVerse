@@ -18,6 +18,8 @@
         <link rel="stylesheet" href="{% static 'detail/css/detail.css' %}">
         <!-- Navbar style  -->
         <link rel="stylesheet" href="{% static 'detail/css/navbard.css' %}">
+        <!-- Actor and Director style  -->
+        <link rel="stylesheet" href="{% static 'detail/css/actor.css' %}">
     </head>
     
     <body>
@@ -64,27 +66,55 @@
 
                     <p class="movie__plot">{{movie.information}}</p>
 
+                    <h3>Distributed by:</h3>
                     <div class="movie__credits">
-                        <p><strong>Distributed by:</strong> {{ movie.distributor }}</p>
-                        <p><strong>Directed by:</strong> {{ movie.director }}</p>
+                        <div class="movie__distributor list--inline">
+                            {% if movie.distributor.image %}
+                                <div class="movie__distributor-photo">
+                                    <img src="{{ movie.distributor.image }}" alt="{{ movie.distributor.label }}">
+                                </div>
+                            {% endif %}
+                            {% if movie.distributor.uri %}
+                                <a href="{{ movie.distributor.uri }}" target="_blank" class="text-primary">{{ movie.distributor.label }}</a>
+                            {% else %}
+                                {{ movie.distributor.label }}
+                            {% endif %}
+                        </div>
+                        
+                        <h3>Directed by:</h3>
+                        <div class="movie__director list--inline">
+                            {% if movie.director.image %}
+                                <div class="movie__director-photo">
+                                    <img src="{{ movie.director.image }}" alt="{{ movie.director.label }}">
+                                </div>
+                            {% endif %}
+                            {% if movie.director.uri %}
+                                <a href="{{ movie.director.uri }}" target="_blank" class="text-primary">{{ movie.director.label }}</a>
+                            {% else %}
+                                {{ movie.director.label }}
+                            {% endif %}
+                        </div>
+                        
                         <p><strong>Starring:</strong></p>
                         <ul class="movie__actors list--inline">
                             {% for star in movie.stars %}
                             <li class="movie__actor">
-                                {% if star.2 %}
-                                    <div class="movie__actor-photo">
+                                <div class="movie__actor-photo">
+                                    {% if star.2 %}
                                         <img src="{{ star.2 }}" alt="{{ star.0 }}">
-                                    </div>
-                                {% endif %}
+                                    {% else %}
+                                        <img src="{% static 'user/images/placeholder.jpg' %}" alt="Placeholder">
+                                    {% endif %}
+                                </div>
                                 {% if star.1 %}
                                     <a href="{{ star.1 }}" target="_blank" class="text-primary">{{ star.0 }}</a>
                                 {% else %}
-                                    {{ star.0 }}
+                                    <a class="disabled">{{ star.0 }}</a>
                                 {% endif %}
                             </li>
                             {% endfor %}
                         </ul>
-                    </div>
+
 
                     <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
                     <p><span class="bold">Running Time:</span> {{ movie.runningTime }}</p>
