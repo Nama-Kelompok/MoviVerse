@@ -52,14 +52,14 @@
                 <div class="movie__details">
                     <h2 class="movie__title">
                         {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
-                            <a href="{{ movie.wikidataUri }}" target="_blank">{{ movie.title }} ({{ movie.releaseYear }})</a>
+                            <a href="{{ movie.wikidataUri }}" target="_blank">{{ movie.title }}</a>
                         {% else %}
-                            {{ movie.title }} ({{ movie.releaseYear }})
+                            {{ movie.title }}
                         {% endif %}
                     </h2>
 
                     <ul class="movie__tags list--inline">
-                        <li class="movie__rated">{{ movie.rating }}</li>
+                        <li class="movie__year">{{ movie.runningTime }}</li>
                         <li class="movie__year">{{movie.releaseYear}}</li>
                         <li class="movie__year">{{ movie.genres }}</li>
                     </ul>
@@ -122,8 +122,8 @@
                         {% endfor %}
                     </ul>
 
+                    <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
                     <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
-                    <p><span class="bold">Running Time:</span> {{ movie.runningTime }}</p>
                     <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
                     <p>
                         <span class="bold">Wikidata URI:</span>

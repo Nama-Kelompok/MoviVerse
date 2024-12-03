@@ -210,3 +210,14 @@ a{
   margin: 16px 0;
   list-style: none;
 }
+
+ul.movie__tags {
+  margin: 0; 
+  padding: 0 16px 0 0; 
+  text-align: left;
+}
+
+ul.movie__tags li {
+  padding-right: 2%;
+  margin: 0; 
+}

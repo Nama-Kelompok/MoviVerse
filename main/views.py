@@ -208,7 +208,6 @@ def get_movie_details(request, uri=None):
                         # Aktor tidak ditemukan di lokal, coba ambil dari Wikidata
                         if movie_wikidata_uri.startswith("http://www.wikidata.org/entity/"):
                             actor_uri, actor_image = fetch_actor_from_wikidata(movie_wikidata_uri, star_label)
-                            print(actor_image)
                             if actor_uri:
                                 data_movie["stars"].append([star_label, actor_uri, actor_image])
                             else:
