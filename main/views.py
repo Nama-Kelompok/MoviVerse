@@ -241,12 +241,10 @@ def get_movie_details(request, uri=None):
                 try:
                     wd_results = wikidata_sparql.query().convert()
                     for wd_result in wd_results["results"]["bindings"]:
-                        print(wd_result)
                         actor_label = wd_result["actorLabel"]["value"]
                         actor_uri = wd_result["actor"]["value"]
                         actor_image = wd_result.get("image", {}).get("value", None)
                         if actor_label not in local_actor_names:
-                            print(actor_label)
                             actors_final.append({
                                 "label": actor_label,
                                 "uri": actor_uri,
