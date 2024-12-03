@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from SPARQLWrapper import SPARQLWrapper, JSON
+import re
 
 host = "http://localhost:7200"
 local_sparql = SPARQLWrapper(f"{host}/repositories/Nama-Kelompok")
@@ -80,7 +81,33 @@ def get_movie_data(request, id):
     context = {"id": id}
     return JsonResponse(context)
 
+def fetch_star_image(uri):
+    """
+    Fetch star image URL from Wikidata using P18 property.
+    """
+    print(uri)
+    sparql_query = f"""
+    SELECT ?image WHERE {{
+        BIND(<{uri}> AS ?star) .
+        ?star wdt:P18 ?image .
+    }}
+    """
+    sparql.setQuery(sparql_query)
+    sparql.setReturnFormat(JSON)
 
+    try:
+        results = sparql.query().convert()
+        if results["results"]["bindings"]:
+            # Extract the Wikimedia Commons file link
+            commons_file_url = results["results"]["bindings"][0]["image"]["value"]
+            return commons_file_url
+        else:
+            print(f"No image found for {uri}")
+            return None
+    except Exception as e:
+        print(f"Error fetching image for {uri}: {e}")
+        return None
+    
 def get_movie_details(request, uri=None):
     print("Mengambil detail film untuk URI:", uri)
 
@@ -150,10 +177,12 @@ def get_movie_details(request, uri=None):
                 if star_uri.strip():
                     star_label = fetch_label(star_uri.strip())
                     uri_star = fetch_cast_uri(data_movie["wikidataUri"], star_label)
-                    if("error" in uri_star):
-                        data_movie["stars"].append([star_label, None])
+                    if ("error" in uri_star):
+                        data_movie["stars"].append([star_label, None, None])
                     else:
-                        data_movie["stars"].append([star_label, uri_star])
+                        star_image = fetch_star_image(uri_star)
+                        print(star_image)
+                        data_movie["stars"].append([star_label, uri_star, star_image])                        
 
             # Ambil label untuk director
             director_uri = data_movie.get("director", "")

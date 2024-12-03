@@ -181,3 +181,44 @@ strong {
   width: 100%;
   text-align: center;
 }
+
+.movie__actors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: flex-start;
+  padding: 0;
+  margin: 16px 0;
+  list-style: none;
+}
+
+.movie__actor {
+  text-align: center;
+  width: 100px;
+}
+
+.movie__actor-photo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.movie__actor-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie__actor a {
+  text-decoration: none;
+  color: #00f;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.movie__actor a:hover {
+  color: #f90;
+}
