@@ -183,7 +183,6 @@ def get_movie_details(request, uri=None):
             if distributor_uri.startswith("http://"):
                 distributor_label = fetch_label(distributor_uri)
                 uri_distributor = fetch_distributor_uri(data_movie["wikidataUri"], distributor_label)
-                print(distributor_uri)
                 distributor_image = fetch_image(uri_distributor)
                 data_movie["distributor"] = {
                     "label": distributor_label,
@@ -198,7 +197,6 @@ def get_movie_details(request, uri=None):
             if director_uri.startswith("http://"):
                 director_label = fetch_label(director_uri)
                 uri_director = fetch_director_uri(data_movie["wikidataUri"], director_label)
-                print(uri_director)
                 director_image = fetch_image(uri_director)
                 data_movie["director"] = {
                     "label": director_label,
@@ -226,7 +224,6 @@ def get_movie_details(request, uri=None):
         return JsonResponse({"error": str(e)}, status=500)
     
 def fetch_label(uri):
-
     sparql_query = f"""
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
