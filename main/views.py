@@ -41,7 +41,7 @@ def search_movies(request):
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         OPTIONAL {{?movieId v:posterLink ?posterLink .}}
-        FILTER(REGEX(?movieName, ".*{re.escape(movie)}.*", "i"))
+        FILTER(REGEX(?movieName, ".*{movie}.*", "i"))
     }} ORDER BY ?movieName
     OFFSET {(page - 1) * PAGE_SIZE}
     LIMIT {PAGE_SIZE + 1}
@@ -57,7 +57,7 @@ def search_movies(request):
     data = {}
     data["hasNextPage"] = hasNextPage
     data["currentPage"] = page
-
+    
     movies = []
     for movie in query_results:
         tempData = {}
@@ -68,7 +68,7 @@ def search_movies(request):
         else:
             tempData["posterLink"] = ""
         movies.append(tempData)
-
+    
     data["movies"] = movies
     return JsonResponse(data)
 
