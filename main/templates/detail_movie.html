@@ -107,16 +107,16 @@
                         {% for star in movie.stars %}
                         <li class="movie__actor">
                             <div class="movie__actor-photo">
-                                {% if star.2 %}
-                                    <img src="{{ star.2 }}" alt="{{ star.0 }}">
+                                {% if star.image %}
+                                    <img src="{{ star.image }}" alt="{{ star.label }}">
                                 {% else %}
                                     <img src="{% static 'user/images/placeholder.jpg' %}" alt="Placeholder">
                                 {% endif %}
                             </div>
-                            {% if star.1 %}
-                                <a href="{{ star.1 }}" target="_blank" class="text-primary">{{ star.0 }}</a>
+                            {% if star.uri %}
+                                <a href="{{ star.uri }}" target="_blank" class="text-primary">{{ star.label }}</a>
                             {% else %}
-                                <a class="disabled">{{ star.0 }}</a>
+                                <a class="disabled">{{ star.label }}</a>
                             {% endif %}
                         </li>
                         {% endfor %}
