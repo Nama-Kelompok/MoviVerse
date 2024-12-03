@@ -97,7 +97,6 @@ def fetch_image(uri):
     try:
         results = sparql.query().convert()
         if results["results"]["bindings"]:
-            # Extract the Wikimedia Commons file link
             return results["results"]["bindings"][0]["image"]["value"]
         else:
             print(f"No image found for {uri}")
@@ -166,7 +165,7 @@ def get_movie_details(request, uri=None):
             for attr in attributes:
                 data_movie[attr] = result[attr]["value"] if attr in result else f"Tidak terdapat data {attr}"
 
-            # Ambil label untuk stars
+            # Fetch Actor/Stars
             stars = data_movie.get("stars", "").split(", ")
             data_movie["stars"] = []
             for star_uri in stars:
@@ -179,20 +178,11 @@ def get_movie_details(request, uri=None):
                         star_image = fetch_image(uri_star)
                         data_movie["stars"].append([star_label, uri_star, star_image])                        
 
-            distributor_uri = data_movie.get("distributor", "")
-            if distributor_uri.startswith("http://"):
-                distributor_label = fetch_label(distributor_uri)
-                uri_distributor = fetch_distributor_uri(data_movie["wikidataUri"], distributor_label)
-                distributor_image = fetch_image(uri_distributor)
-                data_movie["distributor"] = {
-                    "label": distributor_label,
-                    "image": distributor_image,
-                    "uri": uri_distributor,
-                }
-            else:
-                data_movie["distributor"] = {"label": "Tidak terdapat data distributor", "image": None, "uri": None}
+            # Fetch all distributors from Wikidata
+            distributors = fetch_all_distributors(data_movie["wikidataUri"])
+            data_movie["distributors"] = distributors
 
-
+            # Fetch director details
             director_uri = data_movie.get("director", "")
             if director_uri.startswith("http://"):
                 director_label = fetch_label(director_uri)
@@ -206,7 +196,7 @@ def get_movie_details(request, uri=None):
             else:
                 data_movie["director"] = {"label": "Tidak terdapat data director", "image": None, "uri": None}
 
-
+            # Fetch running time
             running_time = data_movie.get("runningTime", "")
             if running_time and running_time.isdigit():  
                 total_minutes = int(running_time)
@@ -215,6 +205,7 @@ def get_movie_details(request, uri=None):
                 data_movie["runningTime"] = f"{hours} Jam {minutes} Menit"
             else:
                 data_movie["runningTime"] = "Tidak terdapat data waktu tayang"
+
             return render(request, "detail_movie.html", {"movie": data_movie})
         else:
             return JsonResponse({"error": "Film tidak ditemukan"}, status=404)
@@ -300,31 +291,34 @@ def fetch_director_uri(uri, nama):
         print(f"Error fetching director URI for {nama}: {e}")
         return None
 
-def fetch_distributor_uri(uri, nama):
-    """
-    Fetch distributor URI from Wikidata using movie URI and distributor's name.
-    """
-    uriid = uri.split("/")[-1]
+def fetch_all_distributors(movie_uri):
+
+    uriid = movie_uri.split("/")[-1]
     sparql_query = f"""
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-    SELECT DISTINCT ?distributor WHERE {{
+    SELECT DISTINCT ?distributor ?label ?logo WHERE {{
         wd:{uriid} wdt:P750 ?distributor .
-        ?distributor rdfs:label ?nama .
-        FILTER(?nama = "{nama}"@en)
-    }} LIMIT 1
+        ?distributor rdfs:label ?label .
+        OPTIONAL {{ ?distributor wdt:P154 ?logo. }} 
+        FILTER(LANG(?label) = "en")
+    }}
     """
     sparql.setQuery(sparql_query)
 
     try:
         results = sparql.query().convert()
-        if results["results"]["bindings"]:
-            return results["results"]["bindings"][0]["distributor"]["value"]
-        else:
-            print(f"No distributor URI found for {nama}")
-            return None
+        distributors = []
+        for binding in results["results"]["bindings"]:
+            distributor = {
+                "label": binding["label"]["value"],
+                "uri": binding["distributor"]["value"],
+                "logo": binding["logo"]["value"] if "logo" in binding else None
+            }
+            distributors.append(distributor)
+        return distributors
     except Exception as e:
-        print(f"Error fetching distributor URI for {nama}: {e}")
-        return None
+        print(f"Error fetching all distributors: {e}")
+        return []
