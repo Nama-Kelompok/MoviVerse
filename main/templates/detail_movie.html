@@ -1,5 +1,5 @@
+{% load static humanize %}
 <!DOCTYPE html>
-{% load static %}
 <html>
     <head>
         <meta charset="UTF-8">
@@ -48,7 +48,7 @@
                         <img src="{{ movie.photoUrl }}" alt="{{ movie.title }}"/>
                     </span>
                 </div>
-    
+
                 <div class="movie__details">
                     <h2 class="movie__title">
                         {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
@@ -57,17 +57,72 @@
                             {{ movie.title }}
                         {% endif %}
                     </h2>
-    
+
                     <ul class="movie__tags list--inline">
                         <li class="movie__year">{{ movie.runningTime }}</li>
-                        <li class="movie__year">{{movie.releaseYear}}</li>
+                        <li class="movie__year">{{ movie.releaseYear }}</li>
                         <li class="movie__year">{{ movie.genres }}</li>
                     </ul>
-    
-                    <p class="movie__plot">{{movie.information}}</p>
-                    <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
-                    <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
+
+                    <p class="movie__plot">{{ movie.information }}</p>
+
+                    <!-- Bagian Review Scores -->
+                    <h3>Review Scores:</h3>
+                    {% if movie.reviews %}
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    {% for review in movie.reviews %}
+                                        <td>
+                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
+                                            <strong>{{ review.score }}</strong>
+                                        </td>
+                                    {% endfor %}
+                                    {% for _ in movie.reviews|length|add:"4"|make_list %}
+                                        {% if forloop.counter0 >= movie.reviews|length %}
+                                            <td></td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No reviews available for this movie.</p>
+                    {% endif %}
+
+                    <!-- Bagian Informasi Tambahan -->
+                    {% if movie.budget and movie.budget != "Tidak terdapat data budget" %}
+                        <p><span class="bold">Budget:</span> $ {{ movie.budget|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.certificate and movie.certificate != "Tidak terdapat data certificate" %}
+                        <p><span class="bold">Certificate:</span> {{ movie.certificate }}</p>
+                    {% endif %}
+                    
+                    {% if movie.domesticOpening and movie.domesticOpening != "Tidak terdapat data domesticOpening" %}
+                        <p><span class="bold">Domestic Opening:</span> $ {{ movie.domesticOpening|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.domesticSales and movie.domesticSales != "Tidak terdapat data domesticSales" %}
+                        <p><span class="bold">Domestic Sales:</span> $ {{ movie.domesticSales|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.internationalSales and movie.internationalSales != "Tidak terdapat data internationalSales" %}
+                        <p><span class="bold">International Sales:</span> $ {{ movie.internationalSales|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.license and movie.license != "Tidak terdapat data license" %}
+                        <p><span class="bold">License:</span> {{ movie.license }}</p>
+                    {% endif %}
+                    
+                    {% if movie.releaseDate and movie.releaseDate != "Tidak terdapat data releaseDate" %}
+                        <p><span class="bold">Release Date:</span> {{ movie.releaseDate }}</p>
+                    {% endif %}
+
+                    {% if movie.votes and movie.votes != "Tidak terdapat data Votes" %}
                     <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
+                    {% endif %}
+                    
                     <p>
                         <span class="bold">Wikidata URI:</span>
                         {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
@@ -116,7 +171,7 @@
                             <span class="disabled">{{ movie.director.label }}</span>
                         {% endif %}
                     </div>
-    
+
                     <p><strong>Starring:</strong></p>
                     <ul class="movie__actors list--inline">
                         {% for star in movie.stars %}
@@ -136,43 +191,7 @@
                         </li>
                         {% endfor %}
                     </ul>
-    
-                    <!-- Bagian Review Scores -->
-                    <h3>Review Scores:</h3>
-                    {% if movie.reviews %}
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr>
-                                    {% for review in movie.reviews|slice:":4" %}
-                                        <td>
-                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
-                                            <strong>{{ review.score }}</strong>
-                                        </td>
-                                    {% endfor %}
-                                    {% for _ in "0123456789"|slice:":4"|make_list %}
-                                        {% if forloop.counter0 >= movie.reviews|length %}
-                                            <td></td>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    {% for review in movie.reviews|slice:"4:8" %}
-                                        <td>
-                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
-                                            <strong>{{ review.score }}</strong>
-                                        </td>
-                                    {% endfor %}
-                                    {% for _ in "0123456789"|slice:":4"|make_list %}
-                                        {% if forloop.counter0 >= movie.reviews|length|add:"-4" %}
-                                            <td></td>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p>Tidak terdapat review scores.</p>
-                    {% endif %}
+
                 </div>
             </div>
         </div>

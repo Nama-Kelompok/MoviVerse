@@ -10,10 +10,6 @@ from .utils.time import format_running_time
 
 from .utils.sparql import local_sparql 
 
-def movie_page(request, id):
-    context = {"id": id}
-    return render(request, "detail.html", context)
-
 def landing_page(request):
     return render(request, "landing.html")
 
@@ -84,7 +80,7 @@ def get_movie_details(request, uri=None):
     if not uri.startswith("http://"):
         uri = f"http://nama-kelompok.org/data/{uri}"
 
-    # Query SPARQL
+    # Query SPARQL fetch data lokal
     sparql_query = f"""
     PREFIX : <http://nama-kelompok.org/data/> 
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -98,6 +94,8 @@ def get_movie_details(request, uri=None):
            ?rating ?metaScore ?information ?photoUrl ?releaseYear ?runningTime 
            (GROUP_CONCAT(DISTINCT ?star; separator=", ") AS ?stars) 
            ?votes ?wikidataUri ?distributor
+           ?budget ?certificate ?domesticOpening ?domesticSales 
+           ?internationalSales ?license ?releaseDate
     WHERE {{
         ?movies rdf:type :Movie .
         ?movies rdfs:label ?title .
@@ -114,10 +112,19 @@ def get_movie_details(request, uri=None):
         OPTIONAL {{ ?movies v:star ?star. }}
         OPTIONAL {{ ?movies v:votes ?votes. }}
         OPTIONAL {{ ?movies v:wikidataUri ?wikidataUri. }}
+        OPTIONAL {{ ?movies v:budget ?budget. }}
+        OPTIONAL {{ ?movies v:certificate ?certificate. }}
+        OPTIONAL {{ ?movies v:domesticOpening ?domesticOpening. }}
+        OPTIONAL {{ ?movies v:domesticSales ?domesticSales. }}
+        OPTIONAL {{ ?movies v:internationalSales ?internationalSales. }}
+        OPTIONAL {{ ?movies v:license ?license. }}
+        OPTIONAL {{ ?movies v:releaseDate ?releaseDate. }}
         VALUES ?movies {{ <{uri}> }} 
     }}
     GROUP BY ?movies ?title ?director ?rating ?metaScore ?information 
              ?photoUrl ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
+             ?budget ?certificate ?domesticOpening ?domesticSales 
+             ?internationalSales ?license ?releaseDate
     LIMIT 1
     """
     local_sparql.setQuery(sparql_query)
@@ -127,7 +134,10 @@ def get_movie_details(request, uri=None):
 
         attributes = [
             "director", "genres", "rating", "metaScore", "information",
-            "photoUrl", "releaseYear", "runningTime", "stars", "votes", "wikidataUri", "distributor"
+            "photoUrl", "releaseYear", "runningTime", "stars", "votes", 
+            "wikidataUri", "distributor",
+            "budget", "certificate", "domesticOpening", "domesticSales",
+            "internationalSales", "license", "releaseDate"
         ]
 
         if results["results"]["bindings"]:
@@ -138,7 +148,19 @@ def get_movie_details(request, uri=None):
             }
 
             for attr in attributes:
-                data_movie[attr] = result[attr]["value"] if attr in result else f"Tidak terdapat data {attr}"
+                if attr in result:
+                    value = result[attr]["value"]
+                    # Konversi tipe data sesuai kebutuhan
+                    if attr in ["budget", "domesticOpening", "domesticSales", "internationalSales", "votes"]:
+                        try:
+                            value = int(value)
+                        except ValueError:
+                            value = value 
+                    elif attr in ["releaseDate"]:
+                        value = value.split("^^")[0].strip('"')
+                    data_movie[attr] = value
+                else:
+                    data_movie[attr] = f"Tidak terdapat data {attr}"
 
             # Mengambil nama aktor
             actors_final = process_actors(data_movie)
@@ -155,8 +177,9 @@ def get_movie_details(request, uri=None):
             running_time = data_movie.get("runningTime", "")
             data_movie["runningTime"] = format_running_time(running_time)
 
-            # Mengambil review scores
-            reviews = fetch_review_scores(uri)
+            # Mengambil review scores, tambahkan rating IMDb jika perlu
+            imdb_rating = data_movie.get("rating")
+            reviews = fetch_review_scores(data_movie["wikidataUri"], imdb_rating)
             data_movie["reviews"] = reviews
 
             return render(request, "detail_movie.html", {"movie": data_movie})
