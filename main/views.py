@@ -4,6 +4,11 @@ from django.urls import reverse
 from SPARQLWrapper import SPARQLWrapper, JSON
 import re
 
+from .utils.distributor import fetch_all_distributors
+from .utils.director import fetch_director_uri
+from .utils.image import fetch_image
+from .utils.actor import fetch_cast_uri,fetch_label
+
 # Inisialisasi SPARQL endpoints
 host = "http://localhost:7200"
 local_sparql = SPARQLWrapper(f"{host}/repositories/Nama-Kelompok")
@@ -80,60 +85,6 @@ def get_movie_data(request, id):
 
     context = {"id": id}
     return JsonResponse(context)
-
-def fetch_image(uri):
-    """
-    Fetch image URL from Wikidata using P18 property.
-    """
-    sparql_query = f"""
-    SELECT ?image WHERE {{
-        BIND(<{uri}> AS ?entity) .
-        ?entity wdt:P18 ?image .
-    }}
-    """
-    wikidata_sparql.setQuery(sparql_query)
-    wikidata_sparql.setReturnFormat(JSON)
-
-    try:
-        results = wikidata_sparql.query().convert()
-        if results["results"]["bindings"]:
-            return results["results"]["bindings"][0]["image"]["value"]
-        else:
-            print(f"No image found for {uri}")
-            return None
-    except Exception as e:
-        print(f"Error fetching image for {uri}: {e}")
-        return None
-
-def fetch_actor_from_wikidata(movie_wikidata_uri, actor_name):
-    """
-    Fetch actor URI and image from Wikidata based on movie's Wikidata URI and actor's name.
-    """
-    movie_id = movie_wikidata_uri.split('/')[-1]
-    sparql_query = f"""
-    SELECT ?actor ?actorLabel ?image WHERE {{
-        wd:{movie_id} wdt:P161 ?actor .
-        ?actor rdfs:label "{actor_name}"@en .
-        OPTIONAL {{ ?actor wdt:P18 ?image. }}
-        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-    }}
-    LIMIT 1
-    """
-    wikidata_sparql.setQuery(sparql_query)
-    wikidata_sparql.setReturnFormat(JSON)
-
-    try:
-        results = wikidata_sparql.query().convert()
-        if results["results"]["bindings"]:
-            actor_uri = results["results"]["bindings"][0]["actor"]["value"]
-            actor_image = results["results"]["bindings"][0].get("image", {}).get("value", None)
-            return actor_uri, actor_image
-        else:
-            print(f"No actor found on Wikidata for name: {actor_name}")
-            return None, None
-    except Exception as e:
-        print(f"Error fetching actor from Wikidata for {actor_name}: {e}")
-        return None, None
 
 def get_movie_details(request, uri=None):
     if not uri.startswith("http://"):
@@ -235,6 +186,7 @@ def get_movie_details(request, uri=None):
                     OPTIONAL {{ ?actor wdt:P18 ?image. }}
                     SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
                 }}
+                LIMIT 20
                 """
                 wikidata_sparql.setQuery(sparql_query_wikidata)
                 wikidata_sparql.setReturnFormat(JSON)
@@ -344,112 +296,3 @@ def get_movie_details(request, uri=None):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-
-def fetch_label(uri):
-    sparql_query = f"""
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-    SELECT ?label WHERE {{
-        <{uri}> rdfs:label ?label .
-    }}
-    LIMIT 1
-    """
-    local_sparql.setQuery(sparql_query)
-
-    try:
-        # Eksekusi query
-        results = local_sparql.query().convert()
-        if results["results"]["bindings"]:
-            return results["results"]["bindings"][0]["label"]["value"]
-        else:
-            return "Label tidak ditemukan"
-    except Exception as e:
-        print(f"Error fetching label for {uri}: {e}")
-        return "Error fetching label"
-
-def fetch_cast_uri(uri, nama):
-    uriid = uri.split("/")[-1]
-    sparql_query = f"""
-                PREFIX wd: <http://www.wikidata.org/entity/>
-                PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-                SELECT DISTINCT * WHERE {{
-                wd:{uriid} wdt:P31 wd:Q11424 ;
-                    wdt:P161 ?cast.
-                ?cast rdfs:label ?nama
-                FILTER(?nama = "{nama}"@en) 
-                }} LIMIT 1
-                """
-    wikidata_sparql.setQuery(sparql_query)
-
-    try:
-        results = wikidata_sparql.query().convert()
-        result = results["results"]["bindings"][0]
-
-        return result["cast"]["value"]
-
-    except Exception as e:
-        return {"error": str(e)}
-
-def fetch_director_uri(uri, nama):
-    """
-    Fetch director URI from Wikidata using movie URI and director's name.
-    """
-    uriid = uri.split("/")[-1]
-    sparql_query = f"""
-    PREFIX wd: <http://www.wikidata.org/entity/>
-    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-    SELECT DISTINCT ?director WHERE {{
-        wd:{uriid} wdt:P57 ?director .
-        ?director rdfs:label ?nama .
-        FILTER(?nama = "{nama}"@en)
-    }} LIMIT 1
-    """
-    wikidata_sparql.setQuery(sparql_query)
-
-    try:
-        results = wikidata_sparql.query().convert()
-        if results["results"]["bindings"]:
-            return results["results"]["bindings"][0]["director"]["value"]
-        else:
-            print(f"No director URI found for {nama}")
-            return None
-    except Exception as e:
-        print(f"Error fetching director URI for {nama}: {e}")
-        return None
-
-def fetch_all_distributors(movie_uri):
-
-    uriid = movie_uri.split("/")[-1]
-    sparql_query = f"""
-    PREFIX wd: <http://www.wikidata.org/entity/>
-    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-    SELECT DISTINCT ?distributor ?label ?logo WHERE {{
-        wd:{uriid} wdt:P750 ?distributor .
-        ?distributor rdfs:label ?label .
-        OPTIONAL {{ ?distributor wdt:P154 ?logo. }} 
-        FILTER(LANG(?label) = "en")
-    }}
-    """
-    wikidata_sparql.setQuery(sparql_query)
-
-    try:
-        results = wikidata_sparql.query().convert()
-        distributors = []
-        for binding in results["results"]["bindings"]:
-            distributor = {
-                "label": binding["label"]["value"],
-                "uri": binding["distributor"]["value"],
-                "logo": binding["logo"]["value"] if "logo" in binding else None
-            }
-            distributors.append(distributor)
-        return distributors
-    except Exception as e:
-        print(f"Error fetching all distributors: {e}")
-        return []

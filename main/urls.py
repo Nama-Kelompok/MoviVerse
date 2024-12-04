@@ -1,6 +1,5 @@
 from django.urls import path
 from main.views import movie_page, search_movies, get_movie_data, landing_page, main_page, fetch_cast_uri, get_movie_details
-from . import views
 
 app_name = 'main'
 
