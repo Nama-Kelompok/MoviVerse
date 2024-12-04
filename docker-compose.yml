@@ -7,6 +7,13 @@ services:
     entrypoint: ["/bin/bash", "/graphdb-data/start.sh"]
     ports:
       - "7200:7200"
+    resources:
+      limits:
+        memory: 1.5g
+        cpus: "1.5"
+      reservations:
+        memory: 1g
+        cpus: "1"
   topmovies:
     build:
       context: .
