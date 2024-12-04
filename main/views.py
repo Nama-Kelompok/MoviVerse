@@ -269,6 +269,7 @@ def get_movie_details(request, uri=None):
             # Fetch director details
             director_uri = data_movie.get("director", "")
             if director_uri.startswith("http://"):
+                # Director exists in local data
                 director_label = fetch_label(director_uri)
                 uri_director = fetch_director_uri(data_movie["wikidataUri"], director_label)
                 director_image = fetch_image(uri_director) if uri_director else None
@@ -278,7 +279,53 @@ def get_movie_details(request, uri=None):
                     "uri": uri_director,
                 }
             else:
-                data_movie["director"] = {"label": "Tidak terdapat data director", "image": None, "uri": None}
+                # Director not found in local data, try fetching from Wikidata
+                director_label = "Tidak terdapat data director"
+                director_uri = None
+                director_image = None
+                if movie_wikidata_uri.startswith("http://www.wikidata.org/entity/"):
+                    movie_id = movie_wikidata_uri.split('/')[-1]
+                    sparql_query_director_wikidata = f"""
+                    PREFIX wd: <http://www.wikidata.org/entity/>
+                    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+                    SELECT ?director ?directorLabel ?image WHERE {{
+                        wd:{movie_id} wdt:P57 ?director .
+                        OPTIONAL {{ ?director wdt:P18 ?image. }}
+                        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+                    }}
+                    LIMIT 1
+                    """
+                    wikidata_sparql.setQuery(sparql_query_director_wikidata)
+                    wikidata_sparql.setReturnFormat(JSON)
+                    try:
+                        director_wd_results = wikidata_sparql.query().convert()
+                        if director_wd_results["results"]["bindings"]:
+                            director_label = director_wd_results["results"]["bindings"][0]["directorLabel"]["value"]
+                            director_uri = director_wd_results["results"]["bindings"][0]["director"]["value"]
+                            director_image = director_wd_results["results"]["bindings"][0].get("image", {}).get("value", None)
+                            # Fetch image from Wikidata if not present
+                            if director_image is None:
+                                director_image = fetch_image(director_uri)
+                            data_movie["director"] = {
+                                "label": director_label,
+                                "image": director_image,
+                                "uri": director_uri,
+                            }
+                        else:
+                            # No director found in Wikidata
+                            data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
+                    except Exception as e:
+                        print(f"Error fetching director from Wikidata: {e}")
+                        data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
+                else:
+                    # No Wikidata URI, cannot fetch director from Wikidata
+                    data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
+
+            # Fetch all distributors from Wikidata
+            distributors = fetch_all_distributors(data_movie["wikidataUri"])
+            data_movie["distributors"] = distributors
 
             # Fetch running time
             running_time = data_movie.get("runningTime", "")
