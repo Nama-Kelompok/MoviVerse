@@ -87,31 +87,3 @@ a:hover, a:active, a:focus {
     color: #fff;
     background: #ea272d;
 }
-
-#moviesContainer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    margin: 20px;
-}
-
-.movie-placeholder {
-    width: 100%;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: #eee;
-    color: #888;
-    font-size: 14px;
-    text-align: center;
-}
-
-.movie-placeholder svg {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 10px;
-    fill: #888;
-}
