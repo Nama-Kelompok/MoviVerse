@@ -1,7 +1,6 @@
 from .sparql import wikidata_sparql
 
 def fetch_country_of_origin(movie_uri):
-    print(f"Fetching country of origin for movie URI: {movie_uri}")
     uriid = movie_uri.split("/")[-1]
     sparql_query = f"""
     PREFIX wd: <http://www.wikidata.org/entity/>
@@ -34,7 +33,6 @@ def fetch_country_of_origin(movie_uri):
         return []
 
 def fetch_awards_received(movie_uri):
-    print(f"Fetching awards received for movie URI: {movie_uri}")
     uriid = movie_uri.split("/")[-1]
     sparql_query = f"""
     PREFIX wd: <http://www.wikidata.org/entity/>
@@ -64,19 +62,19 @@ def fetch_awards_received(movie_uri):
         return []
 
 def fetch_filming_locations(movie_uri):
-    print(f"Fetching filming locations for movie URI: {movie_uri}")
     uriid = movie_uri.split("/")[-1]
     sparql_query = f"""
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-    SELECT DISTINCT ?location ?label ?image WHERE {{
+    SELECT DISTINCT ?location ?label (SAMPLE(?image) AS ?image) WHERE {{
         wd:{uriid} wdt:P915 ?location .
         ?location rdfs:label ?label .
         OPTIONAL {{ ?location wdt:P18 ?image. }}
         FILTER(LANG(?label) = "en")
     }}
+    GROUP BY ?location ?label
     """
     wikidata_sparql.setQuery(sparql_query)
 

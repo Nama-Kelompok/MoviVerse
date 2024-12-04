@@ -107,3 +107,8 @@
         width: 100%;
     }
 }
+
+li.movie__filming-location{
+    text-align: center;
+    width: 100px;
+}
