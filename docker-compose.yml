@@ -2,18 +2,11 @@ services:
   graphdb:
     image: ontotext/graphdb:10.8.0
     container_name: graphdb
-    volume:
+    volumes:
       - ./graphdb:/graphdb-data
     entrypoint: ["/bin/bash", "/graphdb-data/start.sh"]
     ports:
       - "7200:7200"
-    resources:
-      limits:
-        memory: 1.5g
-        cpus: "1.5"
-      reservations:
-        memory: 1g
-        cpus: "1"
   topmovies:
     build:
       context: .
