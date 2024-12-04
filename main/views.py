@@ -37,6 +37,7 @@ def search_movies(request):
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         OPTIONAL {{?movieId v:posterLink ?posterLink .}}
+        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}  # Ambil tahun rilis jika tersedia
         FILTER(REGEX(?movieName, ".*{movie}.*", "i"))
     }} ORDER BY ?movieName
     OFFSET {(page - 1) * PAGE_SIZE}
@@ -63,6 +64,10 @@ def search_movies(request):
             tempData["posterLink"] = movie["posterLink"]["value"]
         else:
             tempData["posterLink"] = ""
+        if "releaseYear" in movie:
+            tempData["releaseYear"] = movie["releaseYear"]["value"] 
+        else:
+            tempData["releaseYear"] = "Unknown"
         movies.append(tempData)
 
     data["movies"] = movies

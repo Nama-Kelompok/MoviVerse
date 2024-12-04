@@ -139,6 +139,10 @@
                 }
             
                 movies.forEach(movie => {
+                    const cardLink = document.createElement("a");
+                    cardLink.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
+                    cardLink.classList.add("card-link");
+            
                     const movieCard = document.createElement("div");
                     movieCard.classList.add("card");
             
@@ -151,46 +155,32 @@
                         movieImage.alt = movie.movieName;
                         cardContainer.appendChild(movieImage);
                     } else {
-                        const placeholder = document.createElement("div");
-                        placeholder.classList.add("movie-placeholder");
-                        placeholder.innerHTML = `
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                            </svg>
-                            <p>No Image Available</p>
-                        `;
-                        cardContainer.appendChild(placeholder);
+                        const movieImage = document.createElement("img");
+                        movieImage.src = "../static/user/images/default.jpg"; 
+                        movieImage.alt = "Default Poster";
+                        cardContainer.appendChild(movieImage);
                     }
             
                     const titleWrapper = document.createElement("div");
                     titleWrapper.classList.add("card-title-wrapper");
             
                     const cardTitle = document.createElement("h3");
+                    cardTitle.classList.add("card-title");
                     cardTitle.textContent = movie.movieName;
                     titleWrapper.appendChild(cardTitle);
+            
+                    const cardYear = document.createElement("p");
+                    cardYear.classList.add("card-year");
+                    cardYear.textContent = movie.releaseYear;
+            
                     cardContainer.appendChild(titleWrapper);
-            
-                    const moreInfoButton = document.createElement("button");
-                    moreInfoButton.classList.add("btninfo");
-                    moreInfoButton.innerHTML = `
-                        <div class="btninfo__bg">
-                            <span class="btninfo__bg__layer btninfo__bg__layer-first"></span>
-                            <span class="btninfo__bg__layer btninfo__bg__layer-second"></span>
-                            <span class="btninfo__bg__layer btninfo__bg__layer-third"></span>
-                        </div>
-                        <span class="btninfo__text-out">More Info</span>
-                        <span class="btninfo__text-in">More Info</span>
-                    `;
-                    moreInfoButton.addEventListener("click", () => {
-                        window.location.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
-                    });
-            
-                    cardContainer.appendChild(moreInfoButton);
+                    cardContainer.appendChild(cardYear);
                     movieCard.appendChild(cardContainer);
-                    moviesContainer.appendChild(movieCard);
+                    cardLink.appendChild(movieCard);
+                    moviesContainer.appendChild(cardLink);
                 });
-            }
-            
+            }            
+                      
             function updatePagination() {
                 document.getElementById("currentPage").textContent = `Page ${page}`;
                 document.getElementById("prevBtn").disabled = page <= 1;
