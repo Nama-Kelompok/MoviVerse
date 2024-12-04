@@ -5,8 +5,10 @@ from django.urls import reverse
 from .utils.distributor import fetch_all_distributors
 from .utils.director import process_director 
 from .utils.actor import process_actors
+from .utils.screenwriter import fetch_all_screenwriters
 from .utils.review import fetch_review_scores
 from .utils.time import format_running_time
+from .utils.additional import fetch_country_of_origin, fetch_awards_received, fetch_filming_locations
 
 from .utils.sparql import local_sparql 
 
@@ -173,6 +175,10 @@ def get_movie_details(request, uri=None):
             # Mengambil nama director menggunakan fungsi process_director
             data_movie = process_director(data_movie)
 
+            # Mengambil nama screenwriter
+            screenwriters = fetch_all_screenwriters(data_movie["wikidataUri"])
+            data_movie["screenwriters"] = screenwriters
+
             # Mengambil running time film
             running_time = data_movie.get("runningTime", "")
             data_movie["runningTime"] = format_running_time(running_time)
@@ -181,6 +187,16 @@ def get_movie_details(request, uri=None):
             imdb_rating = data_movie.get("rating")
             reviews = fetch_review_scores(data_movie["wikidataUri"], imdb_rating)
             data_movie["reviews"] = reviews
+
+            # Mengambil data tambahan
+            countries = fetch_country_of_origin(data_movie["wikidataUri"])
+            data_movie["countries_of_origin"] = countries
+
+            awards = fetch_awards_received(data_movie["wikidataUri"])
+            data_movie["awards_received"] = awards
+
+            filming_locations = fetch_filming_locations(data_movie["wikidataUri"])
+            data_movie["filming_locations"] = filming_locations
 
             return render(request, "detail_movie.html", {"movie": data_movie})
 

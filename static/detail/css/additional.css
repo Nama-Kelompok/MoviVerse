@@ -1,0 +1,109 @@
+.movie__info-label {
+    margin-right: 8px;
+    font-size: 1em;
+    color: #fff;
+}
+
+.movie__country-origin,
+.movie__awards-received {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    margin-bottom: 10px; 
+}
+
+.movie__countries,
+.movie__awards {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 10px; 
+}
+
+.movie__country a,
+.movie__award a,
+.movie__country span,
+.movie__award span {
+    font-size: 1em;
+    color: inherit;
+    text-decoration: none;
+}
+
+.movie__country a.text-primary,
+.movie__award a.text-primary {
+    color: crimson;
+}
+
+.movie__country span.disabled,
+.movie__award span.disabled {
+    color: gray;
+}
+
+/* Filming Locations */
+.movie__filming-locations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: flex-start;
+    padding: 0;
+    margin: 16px 0;
+    list-style: none;
+}
+
+.movie__filming-location {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 120px; 
+}
+
+.movie__filming-location-photo {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-bottom: 8px;
+}
+
+.movie__filming-location-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.movie__filming-location a,
+.movie__filming-location span {
+    font-size: 1em;
+    color: #fff;
+    text-decoration: none;
+}
+
+.movie__filming-location a.text-primary {
+    color: crimson;
+}
+
+.movie__filming-location span.disabled {
+    color: gray;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .movie__title-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .movie__additional-info {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .movie__country-origin,
+    .movie__awards-received,
+    .movie__filming-location {
+        width: 100%;
+    }
+}
