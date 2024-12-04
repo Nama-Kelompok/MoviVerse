@@ -15,6 +15,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+GRAPHDB_URL = os.getenv("GRAPHDB_URL", "http://localhost:7200/repositories/myRepository")
 
 
 # Quick-start development settings - unsuitable for production
