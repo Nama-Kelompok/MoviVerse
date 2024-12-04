@@ -8,6 +8,7 @@ from .utils.actor import process_actors
 from .utils.screenwriter import fetch_all_screenwriters
 from .utils.review import fetch_review_scores
 from .utils.time import format_running_time
+from .utils.additional import fetch_country_of_origin, fetch_awards_received, fetch_filming_locations
 
 from .utils.sparql import local_sparql 
 
@@ -186,6 +187,16 @@ def get_movie_details(request, uri=None):
             imdb_rating = data_movie.get("rating")
             reviews = fetch_review_scores(data_movie["wikidataUri"], imdb_rating)
             data_movie["reviews"] = reviews
+
+            # Mengambil data tambahan
+            countries = fetch_country_of_origin(data_movie["wikidataUri"])
+            data_movie["countries_of_origin"] = countries
+
+            awards = fetch_awards_received(data_movie["wikidataUri"])
+            data_movie["awards_received"] = awards
+
+            filming_locations = fetch_filming_locations(data_movie["wikidataUri"])
+            data_movie["filming_locations"] = filming_locations
 
             return render(request, "detail_movie.html", {"movie": data_movie})
 

@@ -22,6 +22,8 @@
         <link rel="stylesheet" href="{% static 'detail/css/actor.css' %}">        
         <!-- Screenwriter style  -->
         <link rel="stylesheet" href="{% static 'detail/css/screenwriter.css' %}">
+        <!-- Additional Information style  -->
+        <link rel="stylesheet" href="{% static 'detail/css/additional.css' %}">
     </head>
     
     <body>
@@ -52,13 +54,25 @@
                 </div>
 
                 <div class="movie__details">
-                    <h2 class="movie__title">
-                        {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
-                            <a href="{{ movie.wikidataUri }}" target="_blank">{{ movie.title }}</a>
-                        {% else %}
-                            {{ movie.title }}
+                    <!-- Container untuk judul dan bendera -->
+                    <div class="movie__title-container">
+                        <h2 class="movie__title">
+                            {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
+                                <a href="{{ movie.wikidataUri }}" target="_blank">{{ movie.title }}</a>
+                            {% else %}
+                                {{ movie.title }}
+                            {% endif %}
+                        </h2>
+                        {% if movie.countries_of_origin %}
+                            <div class="movie__countries-thumbnail">
+                                {% for country in movie.countries_of_origin %}
+                                    {% if country.image %}
+                                        <img src="{{ country.image }}" alt="{{ country.label }}" title="{{ country.label }}" class="movie__country-thumbnail">
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         {% endif %}
-                    </h2>
+                    </div>
 
                     <ul class="movie__tags list--inline">
                         <li class="movie__year">{{ movie.runningTime }}</li>
@@ -94,7 +108,7 @@
 
                     <!-- Bagian Informasi Tambahan -->
                     {% if movie.budget and movie.budget != "Tidak terdapat data budget" %}
-                        <p><span class="bold">Budget:</span> $ {{ movie.budget|intcomma }}</p>
+                        <p><span class="bold">Budget:</span> ${{ movie.budget|intcomma }}</p>
                     {% endif %}
                     
                     {% if movie.certificate and movie.certificate != "Tidak terdapat data certificate" %}
@@ -102,15 +116,15 @@
                     {% endif %}
                     
                     {% if movie.domesticOpening and movie.domesticOpening != "Tidak terdapat data domesticOpening" %}
-                        <p><span class="bold">Domestic Opening:</span> $ {{ movie.domesticOpening|intcomma }}</p>
+                        <p><span class="bold">Domestic Opening:</span> ${{ movie.domesticOpening|intcomma }}</p>
                     {% endif %}
                     
                     {% if movie.domesticSales and movie.domesticSales != "Tidak terdapat data domesticSales" %}
-                        <p><span class="bold">Domestic Sales:</span> $ {{ movie.domesticSales|intcomma }}</p>
+                        <p><span class="bold">Domestic Sales:</span> ${{ movie.domesticSales|intcomma }}</p>
                     {% endif %}
                     
                     {% if movie.internationalSales and movie.internationalSales != "Tidak terdapat data internationalSales" %}
-                        <p><span class="bold">International Sales:</span> $ {{ movie.internationalSales|intcomma }}</p>
+                        <p><span class="bold">International Sales:</span> ${{ movie.internationalSales|intcomma }}</p>
                     {% endif %}
                     
                     {% if movie.license and movie.license != "Tidak terdapat data license" %}
@@ -123,6 +137,67 @@
 
                     {% if movie.votes and movie.votes != "Tidak terdapat data Votes" %}
                     <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
+                    {% endif %}
+                    
+                    <!-- Bagian Country of Origin -->
+                    {% if movie.countries_of_origin %}
+                        <div class="movie__countries list--inline">
+                            <ul class="movie__countries list--inline">
+                                {% for country in movie.countries_of_origin %}
+                                    <li class="movie__country list--inline">
+                                        {% if country.uri %}
+                                            <a>Country of Origin:  </a> <a href="{{ country.uri }}" target="_blank" class="text-primary">{{ country.label }}</a>
+                                        {% else %}
+                                            <a>Country of Origin:  </a> <span class="disabled">{{ country.label }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+            
+                    <!-- Bagian Awards Received -->
+                    {% if movie.awards_received %}
+                        <h3>Awards Received:</h3>
+                        <div class="movie__awards list--inline">
+                            <ul class="movie__awards list--inline">
+                                {% for award in movie.awards_received %}
+                                    <li class="movie__award">
+                                        {% if award.uri %}
+                                            <a href="{{ award.uri }}" target="_blank" class="text-primary">{{ award.label }}</a>
+                                        {% else %}
+                                            <span class="disabled">{{ award.label }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+ 
+                    <!-- Bagian Filming Locations -->
+                    {% if movie.filming_locations %}
+                        <h3>Filming Locations:</h3>
+                        <div class="movie__filming-locations list--inline">
+                            <ul class="movie__filming-locations list--inline">
+                                {% for location in movie.filming_locations %}
+                                    <li class="movie__filming-location">
+                                        <div class="movie__filming-location-photo">
+                                            {% if location.image %}
+                                                <img src="{{ location.image }}" alt="{{ location.label }}">
+                                            {% else %}
+                                                <img src="{% static 'user/images/placeholder.jpg' %}" alt="Placeholder">
+                                            {% endif %}
+                                        </div>
+                                        {% if location.uri %}
+                                            <a href="{{ location.uri }}" target="_blank" class="text-primary">{{ location.label }}</a>
+                                        {% else %}
+                                            <span class="disabled">{{ location.label }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     {% endif %}
     
                     <h3>Distributed by:</h3>

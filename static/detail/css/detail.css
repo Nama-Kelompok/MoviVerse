@@ -231,3 +231,26 @@ ul.movie__tags li {
   padding-right: 2%;
   margin: 0; 
 }
+
+.movie__title-container {
+  display: flex;
+  align-items: center;
+  gap: 16px; 
+  flex-wrap: wrap;
+  margin-bottom: 16px; 
+}
+
+.movie__countries-thumbnail {
+  display: flex;
+  align-items: center;
+  gap: 8px; 
+}
+
+.movie__country-thumbnail {
+  width: 80px; 
+  height: 50px;
+  margin-left: 22%;
+  margin-top: 2%;
+  margin-bottom: 6%;
+  object-fit: cover;
+}

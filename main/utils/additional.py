@@ -11,9 +11,10 @@ def fetch_country_of_origin(movie_uri):
     SELECT DISTINCT ?country ?label ?image WHERE {{
         wd:{uriid} wdt:P495 ?country .
         ?country rdfs:label ?label .
-        OPTIONAL {{ ?country wdt:P18 ?image. }}
+        OPTIONAL {{ ?country wdt:P41 ?image. }}
         FILTER(LANG(?label) = "en")
     }}
+    LIMIT 1
     """
     wikidata_sparql.setQuery(sparql_query)
 

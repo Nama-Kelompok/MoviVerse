@@ -4,10 +4,8 @@ def format_running_time(running_time):
         hours = total_minutes // 60
         minutes = total_minutes % 60
         
-        # Menentukan bentuk pluralisasi untuk "hour"
-        hour_str = "hour" if hours == 1 else "hours"
-        # Menentukan bentuk pluralisasi untuk "minute"
-        minute_str = "minute" if minutes == 1 else "minutes"
+        hour_str = "h" if hours == 1 else "h"
+        minute_str = "m" if minutes == 1 else "m"
         
         running_time_parts = []
         if hours > 0:
