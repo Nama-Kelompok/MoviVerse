@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load static humanize %}
 <html>
     <head>
         <meta charset="UTF-8">
@@ -48,7 +49,7 @@
                         <img src="{{ movie.photoUrl }}" alt="{{ movie.title }}"/>
                     </span>
                 </div>
-    
+
                 <div class="movie__details">
                     <h2 class="movie__title">
                         {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
@@ -57,14 +58,14 @@
                             {{ movie.title }}
                         {% endif %}
                     </h2>
-    
+
                     <ul class="movie__tags list--inline">
                         <li class="movie__year">{{ movie.runningTime }}</li>
-                        <li class="movie__year">{{movie.releaseYear}}</li>
+                        <li class="movie__year">{{ movie.releaseYear }}</li>
                         <li class="movie__year">{{ movie.genres }}</li>
                     </ul>
-    
-                    <p class="movie__plot">{{movie.information}}</p>
+
+                    <p class="movie__plot">{{ movie.information }}</p>
 
                     <!-- Bagian Review Scores -->
                     <h3>Review Scores:</h3>
@@ -90,7 +91,36 @@
                         <p>No reviews available for this movie.</p>
                     {% endif %}
 
+                    <!-- Bagian Informasi Tambahan -->
+                    {% if movie.budget and movie.budget != "Tidak terdapat data budget" %}
+                        <p><span class="bold">Budget:</span> $ {{ movie.budget|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.certificate and movie.certificate != "Tidak terdapat data certificate" %}
+                        <p><span class="bold">Certificate:</span> {{ movie.certificate }}</p>
+                    {% endif %}
+                    
+                    {% if movie.domesticOpening and movie.domesticOpening != "Tidak terdapat data domesticOpening" %}
+                        <p><span class="bold">Domestic Opening:</span> $ {{ movie.domesticOpening|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.domesticSales and movie.domesticSales != "Tidak terdapat data domesticSales" %}
+                        <p><span class="bold">Domestic Sales:</span> $ {{ movie.domesticSales|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.internationalSales and movie.internationalSales != "Tidak terdapat data internationalSales" %}
+                        <p><span class="bold">International Sales:</span> $ {{ movie.internationalSales|intcomma }}</p>
+                    {% endif %}
+                    
+                    {% if movie.license and movie.license != "Tidak terdapat data license" %}
+                        <p><span class="bold">License:</span> {{ movie.license }}</p>
+                    {% endif %}
+                    
+                    {% if movie.releaseDate and movie.releaseDate != "Tidak terdapat data releaseDate" %}
+                        <p><span class="bold">Release Date:</span> {{ movie.releaseDate }}</p>
+                    {% endif %}
 
+                    <!-- Bagian IMDb Rating dan Votes -->
                     <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
                     <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
                     
