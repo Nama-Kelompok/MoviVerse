@@ -190,7 +190,7 @@ a{
 
 @media (min-width: 600px) {
   .movie__details {
-    padding: 72px;
+    padding: 22px 72px 72px 72px;
   }
 }
 
