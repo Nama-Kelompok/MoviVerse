@@ -2,7 +2,7 @@ services:
   graphdb:
     image: ontotext/graphdb:10.8.0
     container_name: graphdb
-    volumes:
+    volume:
       - ./graphdb:/graphdb-data
     entrypoint: ["/bin/bash", "/graphdb-data/start.sh"]
     ports:
