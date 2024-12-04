@@ -139,15 +139,12 @@
                 }
             
                 movies.forEach(movie => {
-                    // Membuat elemen card
                     const movieCard = document.createElement("div");
                     movieCard.classList.add("card");
             
-                    // Membuat elemen card-container
                     const cardContainer = document.createElement("div");
                     cardContainer.classList.add("card-container");
             
-                    // Menambahkan gambar atau placeholder jika tidak ada
                     if (movie.posterLink) {
                         const movieImage = document.createElement("img");
                         movieImage.src = movie.posterLink;
@@ -165,11 +162,14 @@
                         cardContainer.appendChild(placeholder);
                     }
             
-                    // Membuat elemen judul film
+                    const titleWrapper = document.createElement("div");
+                    titleWrapper.classList.add("card-title-wrapper");
+            
                     const cardTitle = document.createElement("h3");
                     cardTitle.textContent = movie.movieName;
+                    titleWrapper.appendChild(cardTitle);
+                    cardContainer.appendChild(titleWrapper);
             
-                    // Membuat elemen tombol "More Info"
                     const moreInfoButton = document.createElement("button");
                     moreInfoButton.classList.add("btninfo");
                     moreInfoButton.innerHTML = `
@@ -181,25 +181,16 @@
                         <span class="btninfo__text-out">More Info</span>
                         <span class="btninfo__text-in">More Info</span>
                     `;
-            
-                    // Event listener untuk tombol "More Info"
                     moreInfoButton.addEventListener("click", () => {
                         window.location.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
                     });
             
-                    // Menambahkan elemen judul dan tombol ke dalam card-container
-                    cardContainer.appendChild(cardTitle);
                     cardContainer.appendChild(moreInfoButton);
-            
-                    // Menambahkan card-container ke dalam card
                     movieCard.appendChild(cardContainer);
-            
-                    // Menambahkan card ke dalam moviesContainer
                     moviesContainer.appendChild(movieCard);
                 });
             }
             
-
             function updatePagination() {
                 document.getElementById("currentPage").textContent = `Page ${page}`;
                 document.getElementById("prevBtn").disabled = page <= 1;
