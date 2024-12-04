@@ -46,9 +46,9 @@
                     </span>
                     <span class="movie__poster--featured">
                         <img src="{{ movie.photoUrl }}" alt="{{ movie.title }}"/>
-                        </span>
+                    </span>
                 </div>
-
+    
                 <div class="movie__details">
                     <h2 class="movie__title">
                         {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
@@ -57,13 +57,13 @@
                             {{ movie.title }}
                         {% endif %}
                     </h2>
-
+    
                     <ul class="movie__tags list--inline">
                         <li class="movie__year">{{ movie.runningTime }}</li>
                         <li class="movie__year">{{movie.releaseYear}}</li>
                         <li class="movie__year">{{ movie.genres }}</li>
                     </ul>
-
+    
                     <p class="movie__plot">{{movie.information}}</p>
                     <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
                     <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
@@ -76,7 +76,7 @@
                             {{ movie.wikidataUri }}
                         {% endif %}
                     </p>
-
+    
                     <h3>Distributed by:</h3>
                     <div class="movie__credits">
                         <ul class="movie__distributors list--inline">
@@ -116,7 +116,7 @@
                             <span class="disabled">{{ movie.director.label }}</span>
                         {% endif %}
                     </div>
-
+    
                     <p><strong>Starring:</strong></p>
                     <ul class="movie__actors list--inline">
                         {% for star in movie.stars %}
@@ -136,10 +136,47 @@
                         </li>
                         {% endfor %}
                     </ul>
+    
+                    <!-- Bagian Review Scores -->
+                    <h3>Review Scores:</h3>
+                    {% if movie.reviews %}
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    {% for review in movie.reviews|slice:":4" %}
+                                        <td>
+                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
+                                            <strong>{{ review.score }}</strong>
+                                        </td>
+                                    {% endfor %}
+                                    {% for _ in "0123456789"|slice:":4"|make_list %}
+                                        {% if forloop.counter0 >= movie.reviews|length %}
+                                            <td></td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    {% for review in movie.reviews|slice:"4:8" %}
+                                        <td>
+                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
+                                            <strong>{{ review.score }}</strong>
+                                        </td>
+                                    {% endfor %}
+                                    {% for _ in "0123456789"|slice:":4"|make_list %}
+                                        {% if forloop.counter0 >= movie.reviews|length|add:"-4" %}
+                                            <td></td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Tidak terdapat review scores.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-
+    
         <script src="{% static 'user/js/jquery.min.js' %}"></script>
         <script src="{% static 'user/js/jquery.easing.1.3.js' %}"></script>
         <script src="{% static 'user/js/bootstrap.min.js' %}"></script>
@@ -148,4 +185,5 @@
         <script src="{% static 'user/js/jquery.flexslider-min.js' %}"></script>
         <script src="{% static 'user/js/main.js' %}"></script>
     </body>
+    
 </html>

@@ -2,17 +2,16 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from SPARQLWrapper import SPARQLWrapper, JSON
+import re
 
 from .utils.distributor import fetch_all_distributors
 from .utils.director import fetch_director_uri
 from .utils.image import fetch_image
-from .utils.actor import fetch_cast_uri,fetch_label
+from .utils.actor import fetch_cast_uri, fetch_label, process_actors
+from .utils.review import fetch_review_scores
+from .utils.time import format_running_time
 
-host = "http://localhost:7200"
-local_sparql = SPARQLWrapper(f"{host}/repositories/Nama-Kelompok")
-local_sparql.setReturnFormat(JSON)
-wikidata_sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
-wikidata_sparql.setReturnFormat(JSON)
+from .utils.sparql import local_sparql, wikidata_sparql 
 
 def movie_page(request, id):
     context = {"id": id}
@@ -59,7 +58,7 @@ def search_movies(request):
     data = {}
     data["hasNextPage"] = hasNextPage
     data["currentPage"] = page
-    
+
     movies = []
     for movie in query_results:
         tempData = {}
@@ -70,7 +69,7 @@ def search_movies(request):
         else:
             tempData["posterLink"] = ""
         movies.append(tempData)
-    
+
     data["movies"] = movies
     return JsonResponse(data)
 
@@ -145,71 +144,7 @@ def get_movie_details(request, uri=None):
                 data_movie[attr] = result[attr]["value"] if attr in result else f"Tidak terdapat data {attr}"
 
             # Mengambil nama aktor
-            stars = data_movie.get("stars", "").split(", ")
-            movie_wikidata_uri = data_movie.get("wikidataUri", "")
-
-            # Mengambil nama aktor lokal
-            local_actor_names = set()
-            actors_final = []
-
-            for star_uri in stars:
-                if star_uri.strip():
-                    star_label = fetch_label(star_uri.strip())
-                    uri_star = fetch_cast_uri(data_movie["wikidataUri"], star_label)
-                    if ("error" in uri_star):
-                        local_actor_names.add(star_label)
-                        actors_final.append({
-                            "label": star_label,
-                            "uri": None,
-                            "image": None 
-                        })
-                    else:
-                        local_actor_names.add(star_label)
-                        actors_final.append({
-                            "label": star_label,
-                            "uri": uri_star,
-                            "image": None 
-                        })
-                
-            # Mengambil nama aktor dari wikidata dengan limit 20
-            if movie_wikidata_uri.startswith("http://www.wikidata.org/entity/"):
-                movie_id = movie_wikidata_uri.split('/')[-1]
-                sparql_query_wikidata = f"""
-                PREFIX wd: <http://www.wikidata.org/entity/>
-                PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-                SELECT ?actor ?actorLabel ?image WHERE {{
-                    wd:{movie_id} wdt:P161 ?actor .
-                    OPTIONAL {{ ?actor wdt:P18 ?image. }}
-                    SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-                }}
-                LIMIT 20
-                """
-                wikidata_sparql.setQuery(sparql_query_wikidata)
-                wikidata_sparql.setReturnFormat(JSON)
-                try:
-                    wd_results = wikidata_sparql.query().convert()
-                    for wd_result in wd_results["results"]["bindings"]:
-                        actor_label = wd_result["actorLabel"]["value"]
-                        actor_uri = wd_result["actor"]["value"]
-                        actor_image = wd_result.get("image", {}).get("value", None)
-                        if actor_label not in local_actor_names:
-                            actors_final.append({
-                                "label": actor_label,
-                                "uri": actor_uri,
-                                "image": actor_image 
-                            })
-                except Exception as e:
-                    print(f"Error fetching actors from Wikidata: {e}")
-
-            # Mengambil foto untuk setiap aktor
-            for actor in actors_final:
-                if actor["image"] is None:
-                    # Try fetching image from Wikidata
-                    actor_image = fetch_image(actor["uri"])
-                    actor["image"] = actor_image
-
+            actors_final = process_actors(data_movie)
             data_movie["stars"] = actors_final
 
             # Mengambil nama distributor
@@ -229,12 +164,12 @@ def get_movie_details(request, uri=None):
                     "uri": uri_director,
                 }
             else:
-                # Mengambil nama aktor dari wikidata jika tidak ada di lokal
+                # Mengambil nama director jika tidak ada di lokal
                 director_label = "Tidak terdapat data director"
                 director_uri = None
                 director_image = None
-                if movie_wikidata_uri.startswith("http://www.wikidata.org/entity/"):
-                    movie_id = movie_wikidata_uri.split('/')[-1]
+                if data_movie.get("wikidataUri", "").startswith("http://www.wikidata.org/entity/"):
+                    movie_id = data_movie["wikidataUri"].split('/')[-1]
                     sparql_query_director_wikidata = f"""
                     PREFIX wd: <http://www.wikidata.org/entity/>
                     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
@@ -277,36 +212,16 @@ def get_movie_details(request, uri=None):
 
             # Mengambil running time film
             running_time = data_movie.get("runningTime", "")
-            if running_time and running_time.isdigit():  
-                total_minutes = int(running_time)
-                hours = total_minutes // 60
-                minutes = total_minutes % 60
-                
-                if hours == 1:
-                    hour_str = "hour"
-                else:
-                    hour_str = "hours"
-                
-                if minutes == 1:
-                    minute_str = "minute"
-                else:
-                    minute_str = "minutes"
-                
-                running_time_parts = []
-                if hours > 0:
-                    running_time_parts.append(f"{hours} {hour_str}")
-                if minutes > 0:
-                    running_time_parts.append(f"{minutes} {minute_str}")
-                
-                data_movie["runningTime"] = " ".join(running_time_parts)
-            else:
-                data_movie["runningTime"] = "Tidak terdapat data waktu tayang"
+            data_movie["runningTime"] = format_running_time(running_time)
+
+            # Mengambil review scores
+            reviews = fetch_review_scores(uri)
+            data_movie["reviews"] = reviews
 
             return render(request, "detail_movie.html", {"movie": data_movie})
 
         else:
             return JsonResponse({"error": "Film tidak ditemukan"}, status=404)
-
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
