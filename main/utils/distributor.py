@@ -1,6 +1,7 @@
 from .sparql import wikidata_sparql
 
 def fetch_all_distributors(movie_uri):
+    print(f"Fetching reviews for movie URI: {movie_uri}")
     uriid = movie_uri.split("/")[-1]
     sparql_query = f"""
     PREFIX wd: <http://www.wikidata.org/entity/>

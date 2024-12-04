@@ -183,6 +183,11 @@ a{
   opacity: 0;
 }
 
+p.movie__plot {
+  margin-top: 2%; 
+  line-height: 1.6; 
+}
+
 .movie__details {
   flex: 1;
   margin-top: 5%; 

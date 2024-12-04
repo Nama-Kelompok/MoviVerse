@@ -1,20 +1,24 @@
-# utils/review.py
-
 from .sparql import wikidata_sparql
 
 def fetch_review_scores(movie_uri):
-    print(movie_uri)
+    uriid = movie_uri.split("/")[-1]  # Ambil ID terakhir dari URI
     sparql_query = f"""
-    PREFIX : <http://nama-kelompok.org/data/>
-    PREFIX v: <http://nama-kelompok.org/vocab#>
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX p: <http://www.wikidata.org/prop/>
+    PREFIX ps: <http://www.wikidata.org/prop/statement/>
+    PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
     SELECT ?reviewer ?reviewerLabel ?score WHERE {{
-        <{movie_uri}> v:P444 ?score .
-        <{movie_uri}> v:P447 ?reviewer .
-        ?reviewer rdfs:label ?reviewerLabel .
+        wd:{uriid} p:P444 ?reviewStatement .
+        ?reviewStatement ps:P444 ?score .
+        OPTIONAL {{
+            ?reviewStatement pq:P447 ?reviewer .
+            ?reviewer rdfs:label ?reviewerLabel .
+            FILTER(LANG(?reviewerLabel) = "en") 
+        }}
     }}
-    LIMIT 8
+    LIMIT 5
     """
 
     wikidata_sparql.setQuery(sparql_query)
@@ -22,20 +26,19 @@ def fetch_review_scores(movie_uri):
     try:
         results = wikidata_sparql.query().convert()
         print(results)
-
+        
         reviews = []
         for binding in results.get("results", {}).get("bindings", []):
-            reviewer_uri = binding.get("reviewer", {}).get("value")
-            reviewer_label = binding.get("reviewerLabel", {}).get("value")
-            score = binding.get("score", {}).get("value")
+            score_raw = binding.get("score", {}).get("value", "")
+            
+            reviewer_label = binding.get("reviewerLabel", {}).get("value", "Unknown Reviewer")
+            reviewer_uri = binding.get("reviewer", {}).get("value", "#")  # Default URI jika tidak ada
 
-            # Pastikan semua data tersedia
-            if reviewer_uri and reviewer_label and score:
-                reviews.append({
-                    "reviewer_label": reviewer_label,
-                    "reviewer_uri": reviewer_uri,
-                    "score": score
-                })
+            reviews.append({
+                "reviewer_label": reviewer_label,
+                "reviewer_uri": reviewer_uri,
+                "score": score_raw
+            })
 
         return reviews
 

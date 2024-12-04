@@ -65,9 +65,35 @@
                     </ul>
     
                     <p class="movie__plot">{{movie.information}}</p>
+
+                    <!-- Bagian Review Scores -->
+                    <h3>Review Scores:</h3>
+                    {% if movie.reviews %}
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    {% for review in movie.reviews %}
+                                        <td>
+                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
+                                            <strong>{{ review.score }}</strong>
+                                        </td>
+                                    {% endfor %}
+                                    {% for _ in movie.reviews|length|add:"4"|make_list %}
+                                        {% if forloop.counter0 >= movie.reviews|length %}
+                                            <td></td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No reviews available for this movie.</p>
+                    {% endif %}
+
+
                     <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
-                    <p><span class="bold">Metascore:</span> {{ movie.metaScore }}</p>
                     <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
+                    
                     <p>
                         <span class="bold">Wikidata URI:</span>
                         {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
@@ -137,42 +163,6 @@
                         {% endfor %}
                     </ul>
     
-                    <!-- Bagian Review Scores -->
-                    <h3>Review Scores:</h3>
-                    {% if movie.reviews %}
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr>
-                                    {% for review in movie.reviews|slice:":4" %}
-                                        <td>
-                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
-                                            <strong>{{ review.score }}</strong>
-                                        </td>
-                                    {% endfor %}
-                                    {% for _ in "0123456789"|slice:":4"|make_list %}
-                                        {% if forloop.counter0 >= movie.reviews|length %}
-                                            <td></td>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    {% for review in movie.reviews|slice:"4:8" %}
-                                        <td>
-                                            <a href="{{ review.reviewer_uri }}" target="_blank">{{ review.reviewer_label }}</a><br>
-                                            <strong>{{ review.score }}</strong>
-                                        </td>
-                                    {% endfor %}
-                                    {% for _ in "0123456789"|slice:":4"|make_list %}
-                                        {% if forloop.counter0 >= movie.reviews|length|add:"-4" %}
-                                            <td></td>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p>Tidak terdapat review scores.</p>
-                    {% endif %}
                 </div>
             </div>
         </div>

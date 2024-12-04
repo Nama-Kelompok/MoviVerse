@@ -156,8 +156,15 @@ def get_movie_details(request, uri=None):
             data_movie["runningTime"] = format_running_time(running_time)
 
             # Mengambil review scores
-            reviews = fetch_review_scores(uri)
+            reviews = fetch_review_scores(data_movie["wikidataUri"])
+
+            # Tambahkan placeholder untuk properti yang kosong
+            for review in reviews:
+                review["reviewer_uri"] = review.get("reviewer_uri", "#") 
+                review["reviewer_label"] = review.get("reviewer_label", "Unknown Reviewer")
+
             data_movie["reviews"] = reviews
+
 
             return render(request, "detail_movie.html", {"movie": data_movie})
 
