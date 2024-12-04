@@ -281,11 +281,29 @@ def get_movie_details(request, uri=None):
                 total_minutes = int(running_time)
                 hours = total_minutes // 60
                 minutes = total_minutes % 60
-                data_movie["runningTime"] = f"{hours} Jam {minutes} Menit"
+                
+                if hours == 1:
+                    hour_str = "hour"
+                else:
+                    hour_str = "hours"
+                
+                if minutes == 1:
+                    minute_str = "minute"
+                else:
+                    minute_str = "minutes"
+                
+                running_time_parts = []
+                if hours > 0:
+                    running_time_parts.append(f"{hours} {hour_str}")
+                if minutes > 0:
+                    running_time_parts.append(f"{minutes} {minute_str}")
+                
+                data_movie["runningTime"] = " ".join(running_time_parts)
             else:
                 data_movie["runningTime"] = "Tidak terdapat data waktu tayang"
 
             return render(request, "detail_movie.html", {"movie": data_movie})
+
         else:
             return JsonResponse({"error": "Film tidak ditemukan"}, status=404)
 
