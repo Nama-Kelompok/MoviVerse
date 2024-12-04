@@ -44,6 +44,7 @@ def fetch_awards_received(movie_uri):
         ?award rdfs:label ?label .
         FILTER(LANG(?label) = "en")
     }}
+    LIMIT 5
     """
     wikidata_sparql.setQuery(sparql_query)
 

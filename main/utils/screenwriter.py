@@ -1,7 +1,6 @@
 from .sparql import wikidata_sparql
 
 def fetch_all_screenwriters(movie_uri):
-    print(movie_uri)
     uriid = movie_uri.split("/")[-1]
     sparql_query = f"""
     PREFIX wd: <http://www.wikidata.org/entity/>
@@ -23,7 +22,6 @@ def fetch_all_screenwriters(movie_uri):
 
     try:
         results = wikidata_sparql.query().convert()
-        print(results)
         screenwriters = []
         for binding in results["results"]["bindings"]:
             screenwriter = {
