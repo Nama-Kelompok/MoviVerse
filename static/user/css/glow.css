@@ -15,7 +15,7 @@ svg.filters { height:0; width: 0; position: absolute; z-index:-1; }
     position: relative;
     display: inline-block;
     scale: 1;
-    font-size: 68px;
+    font-size: 108px;
     animation: onloadscale 1s ease-out forwards;
     margin-top: 1.8%;
     margin-bottom: 1.8%;
