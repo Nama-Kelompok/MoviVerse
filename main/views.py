@@ -1,17 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from SPARQLWrapper import SPARQLWrapper, JSON
-import re
 
 from .utils.distributor import fetch_all_distributors
-from .utils.director import fetch_director_uri
-from .utils.image import fetch_image
-from .utils.actor import fetch_cast_uri, fetch_label, process_actors
+from .utils.director import process_director 
+from .utils.actor import process_actors
 from .utils.review import fetch_review_scores
 from .utils.time import format_running_time
 
-from .utils.sparql import local_sparql, wikidata_sparql 
+from .utils.sparql import local_sparql 
 
 def movie_page(request, id):
     context = {"id": id}
@@ -151,64 +148,8 @@ def get_movie_details(request, uri=None):
             distributors = fetch_all_distributors(data_movie["wikidataUri"])
             data_movie["distributors"] = distributors
 
-            # Mengambil nama director
-            director_uri = data_movie.get("director", "")
-            if director_uri.startswith("http://"):
-                # Mengambil nama director di wikidata
-                director_label = fetch_label(director_uri)
-                uri_director = fetch_director_uri(data_movie["wikidataUri"], director_label)
-                director_image = fetch_image(uri_director) if uri_director else None
-                data_movie["director"] = {
-                    "label": director_label,
-                    "image": director_image,
-                    "uri": uri_director,
-                }
-            else:
-                # Mengambil nama director jika tidak ada di lokal
-                director_label = "Tidak terdapat data director"
-                director_uri = None
-                director_image = None
-                if data_movie.get("wikidataUri", "").startswith("http://www.wikidata.org/entity/"):
-                    movie_id = data_movie["wikidataUri"].split('/')[-1]
-                    sparql_query_director_wikidata = f"""
-                    PREFIX wd: <http://www.wikidata.org/entity/>
-                    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-                    SELECT ?director ?directorLabel ?image WHERE {{
-                        wd:{movie_id} wdt:P57 ?director .
-                        OPTIONAL {{ ?director wdt:P18 ?image. }}
-                        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-                    }}
-                    LIMIT 1
-                    """
-                    wikidata_sparql.setQuery(sparql_query_director_wikidata)
-                    wikidata_sparql.setReturnFormat(JSON)
-                    try:
-                        director_wd_results = wikidata_sparql.query().convert()
-                        if director_wd_results["results"]["bindings"]:
-                            director_label = director_wd_results["results"]["bindings"][0]["directorLabel"]["value"]
-                            director_uri = director_wd_results["results"]["bindings"][0]["director"]["value"]
-                            director_image = director_wd_results["results"]["bindings"][0].get("image", {}).get("value", None)
-                            # Fetch image from Wikidata if not present
-                            if director_image is None:
-                                director_image = fetch_image(director_uri)
-                            data_movie["director"] = {
-                                "label": director_label,
-                                "image": director_image,
-                                "uri": director_uri,
-                            }
-                        else:
-                            data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
-                    except Exception as e:
-                        print(f"Error fetching director from Wikidata: {e}")
-                        data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
-                else:
-                    data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
-
-            # Mengambil nama distributor dari wikidata
-            distributors = fetch_all_distributors(data_movie["wikidataUri"])
-            data_movie["distributors"] = distributors
+            # Mengambil nama director menggunakan fungsi process_director
+            data_movie = process_director(data_movie)
 
             # Mengambil running time film
             running_time = data_movie.get("runningTime", "")

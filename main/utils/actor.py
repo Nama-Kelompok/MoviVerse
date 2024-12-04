@@ -52,15 +52,6 @@ def fetch_cast_uri(uri, nama):
         return {"error": str(e)}
 
 def process_actors(data_movie):
-    """
-    Process actors from data_movie and update the 'stars' field.
-
-    Args:
-        data_movie (dict): The movie data dictionary.
-
-    Returns:
-        list of dict: Updated list of actors with 'label', 'uri', and 'image'.
-    """
     stars = data_movie.get("stars", "").split(", ")
     movie_wikidata_uri = data_movie.get("wikidataUri", "")
 

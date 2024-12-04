@@ -1,7 +1,6 @@
 from .sparql import wikidata_sparql
 
 def fetch_image(uri):
-    print(uri)
     sparql_query = f"""
     SELECT ?image WHERE {{
         BIND(<{uri}> AS ?entity) .
