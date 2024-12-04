@@ -10,10 +10,6 @@ from .utils.time import format_running_time
 
 from .utils.sparql import local_sparql 
 
-def movie_page(request, id):
-    context = {"id": id}
-    return render(request, "detail.html", context)
-
 def landing_page(request):
     return render(request, "landing.html")
 
