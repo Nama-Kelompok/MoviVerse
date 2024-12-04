@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-{% load static %}
 {% load static humanize %}
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -172,7 +171,7 @@
                             <span class="disabled">{{ movie.director.label }}</span>
                         {% endif %}
                     </div>
-    
+
                     <p><strong>Starring:</strong></p>
                     <ul class="movie__actors list--inline">
                         {% for star in movie.stars %}
@@ -192,7 +191,7 @@
                         </li>
                         {% endfor %}
                     </ul>
-    
+
                 </div>
             </div>
         </div>
