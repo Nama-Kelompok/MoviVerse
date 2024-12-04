@@ -1,22 +1,19 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from SPARQLWrapper import SPARQLWrapper, JSON
-import re
 
 from .utils.distributor import fetch_all_distributors
 from .utils.director import fetch_director_uri
 from .utils.image import fetch_image
 from .utils.actor import fetch_cast_uri,fetch_label
 
-# Inisialisasi SPARQL endpoints
 host = "http://localhost:7200"
 local_sparql = SPARQLWrapper(f"{host}/repositories/Nama-Kelompok")
 local_sparql.setReturnFormat(JSON)
 wikidata_sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
 wikidata_sparql.setReturnFormat(JSON)
 
-# Page detail
 def movie_page(request, id):
     context = {"id": id}
     return render(request, "detail.html", context)
@@ -77,7 +74,7 @@ def search_movies(request):
     data["movies"] = movies
     return JsonResponse(data)
 
-# Detail of movie
+# Mengambil data dari movie
 def get_movie_data(request, id):
     user_agent = request.headers.get("user-agent", "")
     if "Mozilla" not in user_agent:
@@ -86,6 +83,7 @@ def get_movie_data(request, id):
     context = {"id": id}
     return JsonResponse(context)
 
+# Mengambil detail dari movie
 def get_movie_details(request, uri=None):
     if not uri.startswith("http://"):
         uri = f"http://nama-kelompok.org/data/{uri}"
@@ -146,11 +144,11 @@ def get_movie_details(request, uri=None):
             for attr in attributes:
                 data_movie[attr] = result[attr]["value"] if attr in result else f"Tidak terdapat data {attr}"
 
-            # Fetch Actor/Stars
+            # Mengambil nama aktor
             stars = data_movie.get("stars", "").split(", ")
             movie_wikidata_uri = data_movie.get("wikidataUri", "")
 
-            # Step 1: Collect local actors (names only)
+            # Mengambil nama aktor lokal
             local_actor_names = set()
             actors_final = []
 
@@ -173,7 +171,7 @@ def get_movie_details(request, uri=None):
                             "image": None 
                         })
                 
-            # Step 2: Fetch actors from Wikidata
+            # Mengambil nama aktor dari wikidata dengan limit 20
             if movie_wikidata_uri.startswith("http://www.wikidata.org/entity/"):
                 movie_id = movie_wikidata_uri.split('/')[-1]
                 sparql_query_wikidata = f"""
@@ -205,7 +203,7 @@ def get_movie_details(request, uri=None):
                 except Exception as e:
                     print(f"Error fetching actors from Wikidata: {e}")
 
-            # Step 3: Fetch images for all actors
+            # Mengambil foto untuk setiap aktor
             for actor in actors_final:
                 if actor["image"] is None:
                     # Try fetching image from Wikidata
@@ -214,14 +212,14 @@ def get_movie_details(request, uri=None):
 
             data_movie["stars"] = actors_final
 
-            # Fetch all distributors from Wikidata
+            # Mengambil nama distributor
             distributors = fetch_all_distributors(data_movie["wikidataUri"])
             data_movie["distributors"] = distributors
 
-            # Fetch director details
+            # Mengambil nama director
             director_uri = data_movie.get("director", "")
             if director_uri.startswith("http://"):
-                # Director exists in local data
+                # Mengambil nama director di wikidata
                 director_label = fetch_label(director_uri)
                 uri_director = fetch_director_uri(data_movie["wikidataUri"], director_label)
                 director_image = fetch_image(uri_director) if uri_director else None
@@ -231,7 +229,7 @@ def get_movie_details(request, uri=None):
                     "uri": uri_director,
                 }
             else:
-                # Director not found in local data, try fetching from Wikidata
+                # Mengambil nama aktor dari wikidata jika tidak ada di lokal
                 director_label = "Tidak terdapat data director"
                 director_uri = None
                 director_image = None
@@ -266,20 +264,18 @@ def get_movie_details(request, uri=None):
                                 "uri": director_uri,
                             }
                         else:
-                            # No director found in Wikidata
                             data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
                     except Exception as e:
                         print(f"Error fetching director from Wikidata: {e}")
                         data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
                 else:
-                    # No Wikidata URI, cannot fetch director from Wikidata
                     data_movie["director"] = {"label": director_label, "image": director_image, "uri": director_uri}
 
-            # Fetch all distributors from Wikidata
+            # Mengambil nama distributor dari wikidata
             distributors = fetch_all_distributors(data_movie["wikidataUri"])
             data_movie["distributors"] = distributors
 
-            # Fetch running time
+            # Mengambil running time film
             running_time = data_movie.get("runningTime", "")
             if running_time and running_time.isdigit():  
                 total_minutes = int(running_time)
