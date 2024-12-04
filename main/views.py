@@ -156,7 +156,10 @@ def get_movie_details(request, uri=None):
                     value = result[attr]["value"]
                     # Konversi tipe data sesuai kebutuhan
                     if attr in ["budget", "domesticOpening", "domesticSales", "internationalSales", "votes"]:
-                        value = int(value)
+                        try:
+                            value = int(value)
+                        except ValueError:
+                            value = value 
                     elif attr in ["releaseDate"]:
                         value = value.split("^^")[0].strip('"')
                     data_movie[attr] = value
@@ -178,8 +181,9 @@ def get_movie_details(request, uri=None):
             running_time = data_movie.get("runningTime", "")
             data_movie["runningTime"] = format_running_time(running_time)
 
-            # Mengambil review scores
-            reviews = fetch_review_scores(data_movie["wikidataUri"])
+            # Mengambil review scores, tambahkan rating IMDb jika perlu
+            imdb_rating = data_movie.get("rating")
+            reviews = fetch_review_scores(data_movie["wikidataUri"], imdb_rating)
             data_movie["reviews"] = reviews
 
             return render(request, "detail_movie.html", {"movie": data_movie})

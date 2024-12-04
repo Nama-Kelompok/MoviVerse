@@ -120,9 +120,9 @@
                         <p><span class="bold">Release Date:</span> {{ movie.releaseDate }}</p>
                     {% endif %}
 
-                    <!-- Bagian IMDb Rating dan Votes -->
-                    <p><span class="bold">IMDb Rating: </span>{{ movie.rating }} </p>
+                    {% if movie.votes and movie.votes != "Tidak terdapat data Votes" %}
                     <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
+                    {% endif %}
                     
                     <p>
                         <span class="bold">Wikidata URI:</span>
