@@ -1,7 +1,7 @@
 from .sparql import wikidata_sparql
 
 def fetch_review_scores(movie_uri):
-    uriid = movie_uri.split("/")[-1]  # Ambil ID terakhir dari URI
+    uriid = movie_uri.split("/")[-1]
     sparql_query = f"""
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX p: <http://www.wikidata.org/prop/>
@@ -32,7 +32,7 @@ def fetch_review_scores(movie_uri):
             score_raw = binding.get("score", {}).get("value", "")
             
             reviewer_label = binding.get("reviewerLabel", {}).get("value", "Unknown Reviewer")
-            reviewer_uri = binding.get("reviewer", {}).get("value", "#")  # Default URI jika tidak ada
+            reviewer_uri = binding.get("reviewer", {}).get("value", "#") 
 
             reviews.append({
                 "reviewer_label": reviewer_label,
