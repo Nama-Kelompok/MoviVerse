@@ -19,7 +19,9 @@
         <!-- Navbar style  -->
         <link rel="stylesheet" href="{% static 'detail/css/navbard.css' %}">
         <!-- Actor and Director style  -->
-        <link rel="stylesheet" href="{% static 'detail/css/actor.css' %}">
+        <link rel="stylesheet" href="{% static 'detail/css/actor.css' %}">        
+        <!-- Screenwriter style  -->
+        <link rel="stylesheet" href="{% static 'detail/css/screenwriter.css' %}">
     </head>
     
     <body>
@@ -122,15 +124,6 @@
                     {% if movie.votes and movie.votes != "Tidak terdapat data Votes" %}
                     <p><span class="bold">Votes:</span> {{ movie.votes }}</p>
                     {% endif %}
-                    
-                    <p>
-                        <span class="bold">Wikidata URI:</span>
-                        {% if movie.wikidataUri and movie.wikidataUri != "Tidak terdapat data wikidataUri" %}
-                            <a href="{{ movie.wikidataUri }}" target="_blank" class="text-primary">{{ movie.wikidataUri }}</a>
-                        {% else %}
-                            {{ movie.wikidataUri }}
-                        {% endif %}
-                    </p>
     
                     <h3>Distributed by:</h3>
                     <div class="movie__credits">
@@ -169,6 +162,33 @@
                             <a href="{{ movie.director.uri }}" target="_blank" class="text-primary">{{ movie.director.label }}</a>
                         {% else %}
                             <span class="disabled">{{ movie.director.label }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Bagian Screenwriters -->
+                    <h3>Screenwriters:</h3>
+                    <div class="movie__screenwriters list--inline">
+                        {% if movie.screenwriters %}
+                            <ul class="movie__screenwriters list--inline">
+                                {% for screenwriter in movie.screenwriters %}
+                                    <li class="movie__screenwriter">
+                                        <div class="movie__screenwriter-photo">
+                                            {% if screenwriter.image %}
+                                                <img src="{{ screenwriter.image }}" alt="{{ screenwriter.label }}">
+                                            {% else %}
+                                                <img src="{% static 'user/images/placeholder.jpg' %}" alt="Placeholder">
+                                            {% endif %}
+                                        </div>
+                                        {% if screenwriter.uri %}
+                                            <a href="{{ screenwriter.uri }}" target="_blank" class="text-primary">{{ screenwriter.label }}</a>
+                                        {% else %}
+                                            <span class="disabled">{{ screenwriter.label }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No screenwriters available for this movie.</p>
                         {% endif %}
                     </div>
 
