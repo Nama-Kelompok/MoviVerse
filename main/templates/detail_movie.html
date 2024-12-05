@@ -221,7 +221,32 @@
                             </li>
                             {% endfor %}
                         </ul>
-                    </div>                    
+                    </div> 
+                    
+                    <!-- Producer -->
+                    {% if movie.producer %}
+                    <h3>Producer:</h3>
+                    <div class="movie__crew-members list--inline">
+                        <ul class="movie__crew-members list--inline">
+                            {% for member in movie.producer %}
+                                <li class="movie__crew-member">
+                                    <div class="movie__crew-member-photo">
+                                        {% if member.image %}
+                                            <img src="{{ member.image }}" alt="{{ member.label }}">
+                                        {% else %}
+                                            <img src="{% static 'user/images/placeholder.jpg' %}" alt="Placeholder">
+                                        {% endif %}
+                                    </div>
+                                    {% if member.uri %}
+                                        <a href="{{ member.uri }}" target="_blank" class="text-primary">{{ member.label }}</a>
+                                    {% else %}
+                                        <span class="disabled">{{ member.label }}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
                 
                     <h3>Directed by:</h3>
                     <div class="movie__director list--inline">
@@ -415,30 +440,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- Producer -->
-                    {% if movie.producer %}
-                    <h3>Producer:</h3>
-                    <div class="movie__crew-members list--inline">
-                        <ul class="movie__crew-members list--inline">
-                            {% for member in movie.producer %}
-                                <li class="movie__crew-member">
-                                    <div class="movie__crew-member-photo">
-                                        {% if member.image %}
-                                            <img src="{{ member.image }}" alt="{{ member.label }}">
-                                        {% else %}
-                                            <img src="{% static 'user/images/placeholder.jpg' %}" alt="Placeholder">
-                                        {% endif %}
-                                    </div>
-                                    {% if member.uri %}
-                                        <a href="{{ member.uri }}" target="_blank" class="text-primary">{{ member.label }}</a>
-                                    {% else %}
-                                        <span class="disabled">{{ member.label }}</span>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>

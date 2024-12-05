@@ -37,6 +37,8 @@ def search_movies(request):
     # Menentukan ORDER BY berdasarkan sort_input
     if sort_input == "alphabet_asc":
         order_by = "ASC(?movieName)"
+    elif sort_input == "budget":
+        order_by = "DESC(?budget)"
     elif sort_input == "title_desc":
         order_by = "DESC(?movieName)"
     elif sort_input == "release_year":
@@ -58,7 +60,7 @@ def search_movies(request):
 
     SELECT DISTINCT ?movieId ?movieName 
            (COALESCE(?wikipediaPosterLink, ?otherPosterLink) AS ?finalPosterLink) 
-           ?releaseYear ?rating ?internationalSales ?budget WHERE {{
+           ?releaseYear ?rating ?internationalSales (SAMPLE(xsd:integer(?budget)) AS ?normalizedBudget) WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         
@@ -71,14 +73,16 @@ def search_movies(request):
         OPTIONAL {{ ?movieId v:releaseYear ?releaseYear . }}
         OPTIONAL {{ ?movieId v:imdbRating ?rating . }}
         OPTIONAL {{ ?movieId v:internationalSales ?internationalSales . }}
-        
+        OPTIONAL {{ ?movieId v:budget ?budget . }}
         OPTIONAL {{ ?movieId v:genre ?genre . }}
         
         FILTER(
             REGEX(?movieName, ".*{search_input}.*", "i") || 
             (BOUND(?genre) && REGEX(?genre, ".*{search_input}.*", "i"))
         )
-    }} ORDER BY {order_by}
+    }}GROUP BY ?movieId ?movieName ?wikipediaPosterLink ?otherPosterLink 
+          ?releaseYear ?rating ?internationalSales
+    ORDER BY {order_by}
     OFFSET {(page - 1) * PAGE_SIZE}
     LIMIT {PAGE_SIZE + 1}
     """
