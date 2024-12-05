@@ -127,7 +127,7 @@
             function searchMovies() {
                 const searchInput = document.getElementById("search");
                 const searchValue = searchInput.value.trim();
-                window.location.href = `http://127.0.0.1:8000/main_search?search=${encodeURIComponent(searchValue)}`;
+                window.location.href = `/main_search?search=${encodeURIComponent(searchValue)}`;
             }
             
             function renderMovies(movies) {
@@ -141,7 +141,7 @@
             
                 movies.forEach(movie => {
                     const cardLink = document.createElement("a");
-                    cardLink.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
+                    cardLink.href = `/movie/${movie.movieId}`;
                     cardLink.classList.add("card-link");
             
                     const movieCard = document.createElement("div");
