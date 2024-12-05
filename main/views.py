@@ -34,13 +34,23 @@ def search_movies(request):
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    SELECT DISTINCT ?movieId ?movieName ?posterLink ?releaseYear WHERE {{
+    SELECT DISTINCT ?movieId ?movieName (COALESCE(?wikipediaPosterLink, ?otherPosterLink) AS ?finalPosterLink) ?releaseYear WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
-        OPTIONAL {{?movieId v:posterLink ?posterLink .}}
-        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}  # Ambil tahun rilis jika tersedia
+        
+        # Ambil link Wikipedia
+        OPTIONAL {{ ?movieId v:posterLink ?wikipediaPosterLink . 
+        FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
+        
+        # Ambil link lainnya
+        OPTIONAL {{ ?movieId v:posterLink ?otherPosterLink .
+               FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
+               
+        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}
         FILTER(REGEX(?movieName, ".*{movie}.*", "i")) 
     """
+    
+
     if genre != "":
         sparql_query += f"""
                 ?movieId v:genre ?genre .
@@ -52,7 +62,6 @@ def search_movies(request):
         OFFSET {(page - 1) * PAGE_SIZE}
         LIMIT {PAGE_SIZE + 1}
     """
-
 
     local_sparql.setQuery(sparql_query)
     query_results = local_sparql.query().convert()["results"]["bindings"]
@@ -71,18 +80,23 @@ def search_movies(request):
         tempData = {}
         tempData["movieId"] = movie['movieId']["value"]
         tempData["movieName"] = movie["movieName"]["value"]
-        if "posterLink" in movie:
-            tempData["posterLink"] = movie["posterLink"]["value"]
+        
+        # Mengambil posterLink atau posterLinkWikipedia
+        if "finalPosterLink" in movie:
+            tempData["posterLink"] = movie["finalPosterLink"]["value"]
         else:
-            tempData["posterLink"] = ""
+            tempData["posterLink"] = "/static/user/images/placeholder.jpg"
+
         if "releaseYear" in movie:
             tempData["releaseYear"] = movie["releaseYear"]["value"] 
         else:
             tempData["releaseYear"] = "Unknown"
+        
         movies.append(tempData)
 
     data["movies"] = movies
     return JsonResponse(data)
+
 
 # Mengambil data dari movie
 def get_movie_data(request, id):
@@ -109,7 +123,9 @@ def get_movie_details(request, uri=None):
 
     SELECT DISTINCT ?movies ?title ?director 
            (GROUP_CONCAT(DISTINCT ?genre; separator=", ") AS ?genres) 
-           ?rating ?metaScore ?information ?photoUrl ?releaseYear ?runningTime 
+           ?rating ?metaScore ?information 
+           (COALESCE(?wikipediaPosterLink, ?otherPosterLink) AS ?finalPosterLink)
+           ?releaseYear ?runningTime 
            (GROUP_CONCAT(DISTINCT ?star; separator=", ") AS ?stars) 
            ?votes ?wikidataUri ?distributor
            ?budget ?certificate ?domesticOpening ?domesticSales 
@@ -124,7 +140,12 @@ def get_movie_details(request, uri=None):
         OPTIONAL {{ ?movies v:imdbRating ?rating. }}
         OPTIONAL {{ ?movies v:metaScore ?metaScore. }}
         OPTIONAL {{ ?movies v:movieInfo ?information. }}
-        OPTIONAL {{ ?movies v:posterLink ?photoUrl. }}
+
+        OPTIONAL {{ ?movies v:posterLink ?wikipediaPosterLink . 
+        FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
+        
+        OPTIONAL {{ ?movies v:posterLink ?otherPosterLink .
+        FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
         OPTIONAL {{ ?movies v:releaseYear ?releaseYear. }}
         OPTIONAL {{ ?movies v:runningTime ?runningTime. }}
         OPTIONAL {{ ?movies v:star ?star. }}
@@ -140,20 +161,21 @@ def get_movie_details(request, uri=None):
         VALUES ?movies {{ <{uri}> }} 
     }}
     GROUP BY ?movies ?title ?director ?rating ?metaScore ?information 
-             ?photoUrl ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
-             ?budget ?certificate ?domesticOpening ?domesticSales 
-             ?internationalSales ?license ?releaseDate
+         ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
+         ?budget ?certificate ?domesticOpening ?domesticSales 
+         ?internationalSales ?license ?releaseDate 
+         ?wikipediaPosterLink ?otherPosterLink
     LIMIT 1
     """
     local_sparql.setQuery(sparql_query)
-
+    print(sparql_query)
     try:
         results = local_sparql.query().convert()
 
         attributes = [
             "director", "genres", "rating", "metaScore", "information",
-            "photoUrl", "releaseYear", "runningTime", "stars", "votes", 
-            "wikidataUri", "distributor",
+            "finalPosterLink", "releaseYear", "runningTime", 
+            "stars", "votes", "wikidataUri", "distributor",
             "budget", "certificate", "domesticOpening", "domesticSales",
             "internationalSales", "license", "releaseDate"
         ]
@@ -213,6 +235,13 @@ def get_movie_details(request, uri=None):
 
             filming_locations = fetch_filming_locations(data_movie["wikidataUri"])
             data_movie["filming_locations"] = filming_locations
+
+            # Menetapkan photoUrl
+            poster_link = data_movie.get("finalPosterLink", "").strip() 
+            if poster_link and poster_link != "Tidak terdapat data posterLink":
+                data_movie["photoUrl"] = poster_link
+            else:
+                data_movie["photoUrl"] = "{% static 'user/images/placeholder.jpg' %}"
 
             return render(request, "detail_movie.html", {"movie": data_movie})
 
