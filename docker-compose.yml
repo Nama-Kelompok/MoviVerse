@@ -5,8 +5,8 @@ services:
     volumes:
       - ./graphdb:/graphdb-data
     entrypoint: ["/bin/bash", "/graphdb-data/start.sh"]
-    expose:
-      - "7200"
+    ports:
+      - "7200:7200"
     restart: unless-stopped
   topmovies:
     container_name: topmovies-web
