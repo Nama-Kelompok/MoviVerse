@@ -36,8 +36,9 @@ def search_movies(request):
     SELECT DISTINCT * WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
-        OPTIONAL {{?movieId v:posterLink ?posterLink .}}
-        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}  # Ambil tahun rilis jika tersedia
+        OPTIONAL {{ ?movieId v:posterLink ?posterLink . }}
+        OPTIONAL {{ ?movieId v:posterLinkWikipedia ?posterLinkWikipedia . }}
+        OPTIONAL {{ ?movieId v:releaseYear ?releaseYear . }}
         FILTER(REGEX(?movieName, ".*{movie}.*", "i"))
     }} ORDER BY ?movieName
     OFFSET {(page - 1) * PAGE_SIZE}
@@ -60,18 +61,25 @@ def search_movies(request):
         tempData = {}
         tempData["movieId"] = movie['movieId']["value"]
         tempData["movieName"] = movie["movieName"]["value"]
+        
+        # Mengambil posterLink atau posterLinkWikipedia
         if "posterLink" in movie:
             tempData["posterLink"] = movie["posterLink"]["value"]
+        elif "posterLinkWikipedia" in movie:
+            tempData["posterLink"] = movie["posterLinkWikipedia"]["value"]
         else:
-            tempData["posterLink"] = ""
+            tempData["posterLink"] = "/static/user/images/placeholder.jpg"
+
         if "releaseYear" in movie:
             tempData["releaseYear"] = movie["releaseYear"]["value"] 
         else:
             tempData["releaseYear"] = "Unknown"
+        
         movies.append(tempData)
 
     data["movies"] = movies
     return JsonResponse(data)
+
 
 # Mengambil data dari movie
 def get_movie_data(request, id):
@@ -98,7 +106,10 @@ def get_movie_details(request, uri=None):
 
     SELECT DISTINCT ?movies ?title ?director 
            (GROUP_CONCAT(DISTINCT ?genre; separator=", ") AS ?genres) 
-           ?rating ?metaScore ?information ?photoUrl ?releaseYear ?runningTime 
+           ?rating ?metaScore ?information 
+           (SAMPLE(?posterLink) AS ?posterLink) 
+           (SAMPLE(?posterLinkWikipedia) AS ?posterLinkWikipedia) 
+           ?releaseYear ?runningTime 
            (GROUP_CONCAT(DISTINCT ?star; separator=", ") AS ?stars) 
            ?votes ?wikidataUri ?distributor
            ?budget ?certificate ?domesticOpening ?domesticSales 
@@ -113,7 +124,8 @@ def get_movie_details(request, uri=None):
         OPTIONAL {{ ?movies v:imdbRating ?rating. }}
         OPTIONAL {{ ?movies v:metaScore ?metaScore. }}
         OPTIONAL {{ ?movies v:movieInfo ?information. }}
-        OPTIONAL {{ ?movies v:posterLink ?photoUrl. }}
+        OPTIONAL {{ ?movies v:posterLink ?posterLink. }}
+        OPTIONAL {{ ?movies v:posterLinkWikipedia ?posterLinkWikipedia. }}
         OPTIONAL {{ ?movies v:releaseYear ?releaseYear. }}
         OPTIONAL {{ ?movies v:runningTime ?runningTime. }}
         OPTIONAL {{ ?movies v:star ?star. }}
@@ -129,7 +141,7 @@ def get_movie_details(request, uri=None):
         VALUES ?movies {{ <{uri}> }} 
     }}
     GROUP BY ?movies ?title ?director ?rating ?metaScore ?information 
-             ?photoUrl ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
+             ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
              ?budget ?certificate ?domesticOpening ?domesticSales 
              ?internationalSales ?license ?releaseDate
     LIMIT 1
@@ -141,8 +153,8 @@ def get_movie_details(request, uri=None):
 
         attributes = [
             "director", "genres", "rating", "metaScore", "information",
-            "photoUrl", "releaseYear", "runningTime", "stars", "votes", 
-            "wikidataUri", "distributor",
+            "posterLink", "posterLinkWikipedia", "releaseYear", "runningTime", 
+            "stars", "votes", "wikidataUri", "distributor",
             "budget", "certificate", "domesticOpening", "domesticSales",
             "internationalSales", "license", "releaseDate"
         ]
@@ -202,6 +214,16 @@ def get_movie_details(request, uri=None):
 
             filming_locations = fetch_filming_locations(data_movie["wikidataUri"])
             data_movie["filming_locations"] = filming_locations
+
+            # Menetapkan photoUrl dengan prioritas: posterLink > posterLinkWikipedia > placeholder
+            poster_link = data_movie.get("posterLink", "").strip() 
+            poster_link_wikipedia = data_movie.get("posterLinkWikipedia", "").strip()
+            if poster_link and poster_link != "Tidak terdapat data posterLink":
+                data_movie["photoUrl"] = poster_link
+            elif poster_link_wikipedia and poster_link_wikipedia != "Tidak terdapat data posterLinkWikipedia":
+                data_movie["photoUrl"] = poster_link_wikipedia
+            else:
+                data_movie["photoUrl"] = "{% static 'user/images/placeholder.jpg' %}"
 
             return render(request, "detail_movie.html", {"movie": data_movie})
 
