@@ -18,5 +18,5 @@ services:
       - graphdb
     environment:
       - GRAPHDB_URL=http://graphdb:7200/repositories/Nama-Kelompok
-      - DEBUG="False"
+      - DEBUG=False
     restart: unless-stopped
