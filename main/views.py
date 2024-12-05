@@ -34,11 +34,12 @@ def search_movies(request):
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    SELECT DISTINCT ?movieId ?movieName ?posterLink ?releaseYear WHERE {{
+    SELECT DISTINCT * WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         OPTIONAL {{?movieId v:posterLink ?posterLink .}}
-        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}  # Ambil tahun rilis jika tersedia
+        OPTIONAL {{?movieId v:posterLinkWikipedia ?posterLinkWikipedia .}}
+        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}
         FILTER(REGEX(?movieName, ".*{movie}.*", "i")) 
     """
     if genre != "":

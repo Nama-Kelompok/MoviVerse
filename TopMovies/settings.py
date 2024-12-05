@@ -18,7 +18,7 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-GRAPHDB_URL = os.getenv("GRAPHDB_URL", "http://localhost:7200/repositories/myRepository")
+GRAPHDB_URL = os.getenv("GRAPHDB_URL", "http://localhost:7200/repositories/Nama-Kelompok")
 
 
 # Quick-start development settings - unsuitable for production
