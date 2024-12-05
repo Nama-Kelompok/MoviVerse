@@ -29,6 +29,8 @@
         <link rel="stylesheet" href="static/main/css/card.css">
         <!-- Navbar style  -->
         <link rel="stylesheet" href="static/main/css/navbar.css">
+        <!-- Dropdown style  -->
+        <link rel="stylesheet" href="static/main/css/dropdown.css">
         <!-- Modernizr JS -->
         <script src="static/user/js/modernizr-2.6.2.min.js"></script>
 	</head>
@@ -62,31 +64,16 @@
         
         <!-- Sort Dropdown -->
         <div id="sort-section" class="sortContainer">
-            <label>Sort by:</label>
-            <span class="dropdown-el">
-                <input type="radio" name="sortType" value="" id="sort-select" checked>
-                <label for="sort-select">Select</label>
-
-                <input type="radio" name="sortType" value="alphabet_asc" id="sort-alphabet-asc">
-                <label for="sort-alphabet-asc">Alphabet A-Z</label>
-
-                <input type="radio" name="sortType" value="title_desc" id="sort-title-desc">
-                <label for="sort-title-desc">Alphabet Z-A</label>
-
-                <input type="radio" name="sortType" value="release_year" id="sort-release-year">
-                <label for="sort-release-year">Release Year</label>
-
-                <input type="radio" name="sortType" value="rating" id="sort-rating">
-                <label for="sort-rating">Rating</label>
-
-                <input type="radio" name="sortType" value="international_sales" id="sort-international-sales">
-                <label for="sort-international-sales">International Sales</label>
-
-                <input type="radio" name="sortType" value="budget" id="sort-budget">
-                <label for="sort-budget">Budget</label>
-            </span>
+            <select id="sort" onchange="resetPageAndFetch()">
+                <option value="">Sort by:</option>
+                <option value="alphabet_asc">Alphabet A-Z</option>
+                <option value="title_desc">Alphabet Z-A</option>
+                <option value="release_year">Release Year</option>
+                <option value="rating">Rating</option>
+                <option value="international_sales">International Sales</option>
+                <option value="budget">Budget</option>
+            </select>
         </div>
-
         
         <div id="moviesContainer">
             <!-- Movie cards akan tampil disini -->
@@ -297,35 +284,6 @@
                 document.getElementById("sort").value = params.sort;
                 fetchResult();
             };
-
-            // Menambahkan event listener untuk dropdown-el agar bisa toggle kelas 'expanded'
-            document.querySelectorAll('.dropdown-el').forEach(dropdown => {
-                dropdown.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.classList.toggle('expanded');
-                    // Pastikan klik tidak memicu perubahan lainnya
-                });
-            });
-
-            // Menutup dropdown ketika klik di luar
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-el').forEach(dropdown => {
-                    dropdown.classList.remove('expanded');
-                });
-            });
-
-            // Menambahkan event listener untuk radio buttons agar menutup dropdown setelah dipilih
-            document.querySelectorAll('.dropdown-el input[type="radio"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.querySelectorAll('.dropdown-el').forEach(dropdown => {
-                        dropdown.classList.remove('expanded');
-                    });
-                    // Reset halaman ke 1 saat sort diubah
-                    page = 1;
-                    fetchResult();
-                });
-            });
         </script>
         
         <!-- jQuery -->
