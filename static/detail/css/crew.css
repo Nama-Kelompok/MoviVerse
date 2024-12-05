@@ -1,0 +1,52 @@
+.movie__crew-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: flex-start;
+  padding: 0;
+  margin: 16px 0;
+  list-style: none;
+}
+
+.movie__crew-member {
+  text-align: center;
+  width: 100px;
+}
+
+.movie__crew-member-photo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.movie__crew-member-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie__crew-member a {
+  text-decoration: none;
+  color: crimson;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.movie__crew-member a:hover {
+  color: #f90;
+}
+
+.movie__crew-member a.disabled {
+  text-decoration: none;
+  color: #999;
+  font-weight: normal;
+  cursor: default;
+}
+
+.movie__crew-member a.disabled:hover {
+  color: #999;
+}

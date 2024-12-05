@@ -9,6 +9,14 @@ from .utils.screenwriter import fetch_all_screenwriters
 from .utils.review import fetch_review_scores
 from .utils.time import format_running_time
 from .utils.additional import fetch_country_of_origin, fetch_awards_received, fetch_filming_locations
+from .utils.supporting import (
+    fetch_director_of_photography,
+    fetch_film_editor,
+    fetch_production_designer,
+    fetch_costume_designer,
+    fetch_composer,
+    fetch_producer
+)
 
 from .utils.sparql import local_sparql 
 
@@ -217,6 +225,14 @@ def get_movie_details(request, uri=None):
 
             filming_locations = fetch_filming_locations(data_movie["wikidataUri"])
             data_movie["filming_locations"] = filming_locations
+
+            # Fetch crew members
+            data_movie["director_of_photography"] = fetch_director_of_photography(data_movie["wikidataUri"])
+            data_movie["film_editor"] = fetch_film_editor(data_movie["wikidataUri"])
+            data_movie["production_designer"] = fetch_production_designer(data_movie["wikidataUri"])
+            data_movie["costume_designer"] = fetch_costume_designer(data_movie["wikidataUri"])
+            data_movie["composer"] = fetch_composer(data_movie["wikidataUri"])
+            data_movie["producer"] = fetch_producer(data_movie["wikidataUri"])
 
             # Menetapkan photoUrl
             poster_link = data_movie.get("finalPosterLink", "").strip() 
