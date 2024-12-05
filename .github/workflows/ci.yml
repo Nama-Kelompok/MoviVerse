@@ -31,7 +31,7 @@ jobs:
           git reset --hard &&
           git pull origin main &&
           sudo docker compose down --rmi all &&
-          sudo docker compose build --no-cache &&
+          sudo docker prune -a -f &&
           sudo docker compose pull &&
-          sudo docker compose up -d
+          sudo docker compose up -d --build
           "
