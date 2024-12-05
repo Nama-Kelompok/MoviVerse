@@ -25,7 +25,7 @@ GRAPHDB_URL = os.getenv("GRAPHDB_URL", "http://localhost:7200/repositories/Nama-
 SECRET_KEY = 'django-insecure-au9r8+2!z)g4x*2ni2*)(^p(=h*l=t=^r=8sp%t7$-cc2z*-ro'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(os.getenv("DEBUG", "1")))
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
