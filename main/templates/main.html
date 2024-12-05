@@ -65,7 +65,7 @@
             <label for="sort">Sort by:</label>
             <select id="sort" onchange="resetPageAndFetch()">
                 <option value="">Select</option>
-                <option value="title_asc">Alphabet A-Z</option>
+                <option value="alphabet_asc">Alphabet A-Z</option> <!-- Ubah dari title_asc ke alphabet_asc -->
                 <option value="title_desc">Alphabet Z-A</option>
                 <option value="release_year">Release Year</option>
                 <option value="rating">Rating</option>
@@ -112,62 +112,91 @@
         </div>
         
         <script>
-            let movie = "{{ search }}";
+            // Fungsi untuk mengambil parameter dari URL
+            function getQueryParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    search: params.get('search') || '',
+                    sort: params.get('sort') || '',
+                    page: parseInt(params.get('page')) || 1
+                };
+            }
+        
+            // Fungsi untuk memperbarui URL tanpa reload halaman
+            function updateURL(params) {
+                const url = new URL(window.location);
+                url.searchParams.set('search', params.search);
+                url.searchParams.set('sort', params.sort);
+                url.searchParams.set('page', params.page);
+                window.history.replaceState({}, '', url);
+            }
+        
             let page = 1;
             let hasNext = false;
-
+        
             async function fetchResult() {
                 const searchInput = document.getElementById("search");
                 const searchValue = searchInput.value.trim(); 
+                const sortSelect = document.getElementById("sort");
+                const sortValue = sortSelect.value;
                 const currentPage = page || 1; 
-            
-                const url = `{% url 'main:search_movie' %}?page=${currentPage}&movie=${encodeURIComponent(searchValue)}&genre=${encodeURIComponent(searchValue)}`;
+        
+                const url = `{% url 'main:search_movie' %}?page=${currentPage}&movie=${encodeURIComponent(searchValue)}&genre=${encodeURIComponent(searchValue)}&sort=${encodeURIComponent(sortValue)}`;
                 try {
                     const response = await fetch(url);
                     if (!response.ok) throw new Error("Failed to fetch data");
-            
+        
                     const data = await response.json();
                     hasNext = data.hasNextPage;
-            
+        
                     updatePagination();
                     renderMovies(data.movies);
+        
+                    // Update URL dengan parameter saat ini
+                    updateURL({ search: searchValue, sort: sortValue, page: currentPage });
+        
                 } catch (error) {
                     console.error(error);
                     document.getElementById("moviesContainer").innerHTML = "<p>Error fetching data. Please try again later.</p>";
                 }
             }
-
+        
+            // Fungsi untuk mengatur ulang halaman dan memanggil fetchResult
             function resetPageAndFetch() {
                 page = 1; 
                 fetchResult();
             }
-
+        
+            // Fungsi untuk menangani pencarian
             function searchMovies() {
                 const searchInput = document.getElementById("search");
                 const searchValue = searchInput.value.trim();
-                window.location.href = `http://127.0.0.1:8000/main_search?search=${encodeURIComponent(searchValue)}`;
+                const sortValue = document.getElementById("sort").value;
+                page = 1;
+                fetchResult();
             }
-            
+        
+            // Fungsi untuk merender kartu film
             function renderMovies(movies) {
                 const moviesContainer = document.getElementById("moviesContainer");
                 moviesContainer.innerHTML = "";
-            
+        
                 if (!movies || movies.length === 0) {
                     moviesContainer.innerHTML = "<p>No movies found.</p>";
                     return;
                 }
-            
+        
                 movies.forEach(movie => {
                     const cardLink = document.createElement("a");
                     cardLink.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
                     cardLink.classList.add("card-link");
-            
+        
                     const movieCard = document.createElement("div");
                     movieCard.classList.add("card");
-            
+        
                     const cardContainer = document.createElement("div");
                     cardContainer.classList.add("card-container");
-            
+        
                     if (movie.posterLink) {
                         const movieImage = document.createElement("img");
                         movieImage.src = movie.posterLink;
@@ -179,19 +208,19 @@
                         movieImage.alt = "Default Poster";
                         cardContainer.appendChild(movieImage);
                     }
-            
+        
                     const titleWrapper = document.createElement("div");
                     titleWrapper.classList.add("card-title-wrapper");
-            
+        
                     const cardTitle = document.createElement("h3");
                     cardTitle.classList.add("card-title");
                     cardTitle.textContent = movie.movieName;
                     titleWrapper.appendChild(cardTitle);
-            
+        
                     const cardYear = document.createElement("p");
                     cardYear.classList.add("card-year");
                     cardYear.textContent = movie.releaseYear;
-            
+        
                     cardContainer.appendChild(titleWrapper);
                     cardContainer.appendChild(cardYear);
                     movieCard.appendChild(cardContainer);
@@ -199,29 +228,40 @@
                     moviesContainer.appendChild(cardLink);
                 });
             }            
-                      
+                  
+            // Fungsi untuk memperbarui pagination
             function updatePagination() {
                 document.getElementById("currentPage").textContent = `Page ${page}`;
                 document.getElementById("prevBtn").disabled = page <= 1;
                 document.getElementById("nextBtn").disabled = !hasNext;
             }
-
+        
+            // Fungsi untuk tombol Prev
             function prev() {
                 if (page > 1) {
                     page--;
                     fetchResult();
                 }
             }
-
+        
+            // Fungsi untuk tombol Next
             function next() {
                 if (hasNext) {
                     page++;
                     fetchResult();
                 }
             }
-
-            window.onload = fetchResult;
+        
+            // Inisialisasi halaman berdasarkan URL saat dimuat
+            window.onload = function() {
+                const params = getQueryParams();
+                page = params.page;
+                document.getElementById("search").value = params.search;
+                document.getElementById("sort").value = params.sort;
+                fetchResult();
+            };
         </script>
+        
 
         <!-- jQuery -->
         <script src="static/user/js/jquery.min.js"></script>

@@ -31,7 +31,22 @@ def main_page(request):
 def search_movies(request):
     PAGE_SIZE = 20
     search_input = request.GET.get("movie", "").strip()
+    sort_input = request.GET.get("sort", "").strip()
     page = int(request.GET.get("page", 1))
+    
+    # Menentukan ORDER BY berdasarkan sort_input
+    if sort_input == "alphabet_asc":
+        order_by = "ASC(?movieName)"
+    elif sort_input == "title_desc":
+        order_by = "DESC(?movieName)"
+    elif sort_input == "release_year":
+        order_by = "DESC(xsd:integer(?releaseYear))"
+    elif sort_input == "rating":
+        order_by = "DESC(xsd:decimal(?rating))"
+    elif sort_input == "international_sales":
+        order_by = "DESC(xsd:decimal(?internationalSales))"
+    else:
+        order_by = "ASC(?movieName)"
     
     sparql_query = f"""
     PREFIX : <http://nama-kelompok.org/data/> 
@@ -41,53 +56,61 @@ def search_movies(request):
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    SELECT DISTINCT ?movieId ?movieName (COALESCE(?wikipediaPosterLink, ?otherPosterLink) AS ?finalPosterLink) ?releaseYear WHERE {{
+    SELECT DISTINCT ?movieId ?movieName 
+           (COALESCE(?wikipediaPosterLink, ?otherPosterLink) AS ?finalPosterLink) 
+           ?releaseYear ?rating ?internationalSales ?budget WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         
         OPTIONAL {{ ?movieId v:posterLink ?wikipediaPosterLink . 
-        FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
+                   FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
         
         OPTIONAL {{ ?movieId v:posterLink ?otherPosterLink .
-               FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
-               
-        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}
-        
+                   FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
+                   
+        OPTIONAL {{ ?movieId v:releaseYear ?releaseYear . }}
+        OPTIONAL {{ ?movieId v:imdbRating ?rating . }}
+        OPTIONAL {{ ?movieId v:internationalSales ?internationalSales . }}
         
         OPTIONAL {{ ?movieId v:genre ?genre . }}
+        
         FILTER(
             REGEX(?movieName, ".*{search_input}.*", "i") || 
             (BOUND(?genre) && REGEX(?genre, ".*{search_input}.*", "i"))
         )
-    }} ORDER BY  (IF(REGEX(?movieName, ".*{search_input}.*", "i"), 0, 1))  ?movieName
+    }} ORDER BY {order_by}
     OFFSET {(page - 1) * PAGE_SIZE}
     LIMIT {PAGE_SIZE + 1}
     """
 
     local_sparql.setQuery(sparql_query)
-    query_results = local_sparql.query().convert()["results"]["bindings"]
+    try:
+        query_results = local_sparql.query().convert()["results"]["bindings"]
 
-    hasNextPage = False
-    if len(query_results) > PAGE_SIZE:
-        hasNextPage = True
-        query_results = query_results[:PAGE_SIZE]
+        hasNextPage = False
+        if len(query_results) > PAGE_SIZE:
+            hasNextPage = True
+            query_results = query_results[:PAGE_SIZE]
 
-    data = {
-        "hasNextPage": hasNextPage,
-        "currentPage": page,
-        "movies": []
-    }
-
-    for movie in query_results:
-        tempData = {
-            "movieId": movie['movieId']["value"],
-            "movieName": movie["movieName"]["value"],
-            "posterLink": movie.get("finalPosterLink", {}).get("value", "/static/user/images/placeholder.jpg"),
-            "releaseYear": movie.get("releaseYear", {}).get("value", "Unknown")
+        data = {
+            "hasNextPage": hasNextPage,
+            "currentPage": page,
+            "movies": []
         }
-        data["movies"].append(tempData)
 
-    return JsonResponse(data)
+        for movie in query_results:
+            tempData = {
+                "movieId": movie['movieId']["value"],
+                "movieName": movie["movieName"]["value"],
+                "posterLink": movie.get("finalPosterLink", {}).get("value", "/static/user/images/default.jpg"),
+                "releaseYear": movie.get("releaseYear", {}).get("value", "Unknown")
+            }
+            data["movies"].append(tempData)
+
+        return JsonResponse(data)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 # Mengambil data dari movie
 def get_movie_data(request, id):
