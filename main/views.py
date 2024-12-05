@@ -25,7 +25,6 @@ def search_movies(request):
     search_input = request.GET.get("movie", "").strip()
     page = int(request.GET.get("page", 1))
     
-    # Gunakan search_input untuk kedua parameter movie dan genre
     sparql_query = f"""
     PREFIX : <http://nama-kelompok.org/data/> 
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -38,11 +37,9 @@ def search_movies(request):
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         
-        # Ambil link Wikipedia
         OPTIONAL {{ ?movieId v:posterLink ?wikipediaPosterLink . 
         FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
         
-        # Ambil link lainnya
         OPTIONAL {{ ?movieId v:posterLink ?otherPosterLink .
                FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
                
