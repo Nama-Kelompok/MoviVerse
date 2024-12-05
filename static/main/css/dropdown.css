@@ -1,0 +1,57 @@
+#sort-section {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 1000; 
+}
+
+#sort-section label {
+  color: white;
+  font-family: 'Inconsolata', monospace;
+  font-size: 1.2em;
+  margin-right: 10px;
+}
+
+#sort-section select {
+  font-family: 'Inconsolata', monospace;
+  background: #151515;
+  color: white;
+  border: 1px solid crimson;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1em;
+  box-shadow: 0 0 10px crimson;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+#sort-section select:hover {
+  cursor: pointer;
+  box-shadow: 0 0 15px crimson;
+  background: crimson;
+  color: #151515;
+}
+
+#sort-section select:focus {
+  outline: none;
+  box-shadow: 0 0 20px crimson;
+  background: crimson;
+  color: white;
+}
+
+@media (max-width: 950px) {
+  #sort-section {
+    top: 25%; 
+  }
+
+  #sort-section label {
+    font-size: 1em; 
+  }
+
+  #sort-section select {
+    padding: 8px 15px;
+    font-size: 0.9em;
+  }
+}
+
