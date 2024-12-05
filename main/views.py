@@ -59,7 +59,7 @@ def search_movies(request):
             REGEX(?movieName, ".*{search_input}.*", "i") || 
             (BOUND(?genre) && REGEX(?genre, ".*{search_input}.*", "i"))
         )
-    }} ORDER BY ?movieName
+    }} ORDER BY  (IF(REGEX(?movieName, ".*{search_input}.*", "i"), 0, 1))  ?movieName
     OFFSET {(page - 1) * PAGE_SIZE}
     LIMIT {PAGE_SIZE + 1}
     """
