@@ -34,14 +34,14 @@ def search_movies(request):
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    SELECT DISTINCT * WHERE {{
+    SELECT DISTINCT ?movieId ?movieName (SAMPLE(?posterLink) AS ?uniquePosterLink) ?releaseYear WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         OPTIONAL {{?movieId v:posterLink ?posterLink .}}
-        OPTIONAL {{?movieId v:posterLinkWikipedia ?posterLinkWikipedia .}}
         OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}
         FILTER(REGEX(?movieName, ".*{movie}.*", "i")) 
     """
+    
     if genre != "":
         sparql_query += f"""
                 ?movieId v:genre ?genre .
@@ -49,7 +49,8 @@ def search_movies(request):
         """
 
     sparql_query += f""" 
-        }} ORDER BY ?movieName
+        }} GROUP BY ?movieId ?movieName ?releaseYear
+        ORDER BY ?movieName
         OFFSET {(page - 1) * PAGE_SIZE}
         LIMIT {PAGE_SIZE + 1}
     """
@@ -73,10 +74,8 @@ def search_movies(request):
         tempData["movieName"] = movie["movieName"]["value"]
         
         # Mengambil posterLink atau posterLinkWikipedia
-        if "posterLink" in movie:
-            tempData["posterLink"] = movie["posterLink"]["value"]
-        elif "posterLinkWikipedia" in movie:
-            tempData["posterLink"] = movie["posterLinkWikipedia"]["value"]
+        if "uniquePosterLink" in movie:
+            tempData["posterLink"] = movie["uniquePosterLink"]["value"]
         else:
             tempData["posterLink"] = "/static/user/images/placeholder.jpg"
 
