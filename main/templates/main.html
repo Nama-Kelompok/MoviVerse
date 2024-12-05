@@ -105,9 +105,9 @@
             async function fetchResult() {
                 const searchInput = document.getElementById("search");
                 const searchValue = searchInput.value.trim(); 
-                movie = searchValue || movie;
+                const currentPage = page || 1; 
             
-                const url = "{% url 'main:search_movie' %}?page=" + page + "&movie=" + movie;
+                const url = `{% url 'main:search_movie' %}?page=${currentPage}&movie=${encodeURIComponent(searchValue)}&genre=${encodeURIComponent(searchValue)}`;
                 try {
                     const response = await fetch(url);
                     if (!response.ok) throw new Error("Failed to fetch data");
@@ -122,6 +122,7 @@
                     document.getElementById("moviesContainer").innerHTML = "<p>Error fetching data. Please try again later.</p>";
                 }
             }
+            
 
             function searchMovies() {
                 const searchInput = document.getElementById("search");

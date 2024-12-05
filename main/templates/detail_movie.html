@@ -156,7 +156,6 @@
                         </div>
                     {% endif %}
 
-            
                     <!-- Bagian Awards Received -->
                     {% if movie.awards_received %}
                         <h3>Awards Received:</h3>
@@ -224,6 +223,7 @@
                 
                     <h3>Directed by:</h3>
                     <div class="movie__director list--inline">
+                        <li class="movie__screenwriter">
                         {% if movie.director.image %}
                             <div class="movie__director-photo">
                                 <img src="{{ movie.director.image }}" alt="{{ movie.director.label }}">
@@ -238,6 +238,7 @@
                         {% else %}
                             <span class="disabled">{{ movie.director.label }}</span>
                         {% endif %}
+                        </li>
                     </div>
 
                     <!-- Bagian Screenwriters -->
