@@ -82,7 +82,7 @@ def search_movies(request):
         tempData = {
             "movieId": movie['movieId']["value"],
             "movieName": movie["movieName"]["value"],
-            "posterLink": movie.get("finalPosterLink", {}).get("value", "/static/user/images/placeholder.jpg"),
+            "posterLink": movie.get("finalPosterLink", {}).get("value", "/static/user/images/default.jpg"),
             "releaseYear": movie.get("releaseYear", {}).get("value", "Unknown")
         }
         data["movies"].append(tempData)
