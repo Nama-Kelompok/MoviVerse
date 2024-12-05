@@ -198,7 +198,7 @@
         
                 movies.forEach(movie => {
                     const cardLink = document.createElement("a");
-                    cardLink.href = `/movie/${movie.movieId}`;
+                    cardLink.href = `/movie/${movie.movieId.split("/")[4]}`;
                     cardLink.classList.add("card-link");
         
                     const movieCard = document.createElement("div");
