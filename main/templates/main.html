@@ -160,7 +160,6 @@
                     updatePagination();
                     renderMovies(data.movies);
         
-                    // Update URL dengan parameter saat ini
                     updateURL({ search: searchValue, sort: sortValue, page: currentPage });
         
                 } catch (error) {
@@ -183,11 +182,7 @@
         
                 // Reset sort ke nilai default
                 sortSelect.value = "";
-                
-                // Reset halaman ke 1
                 page = 1;
-                
-                // Fetch hasil dengan search baru dan sort yang di-reset
                 fetchResult();
             }
         
@@ -203,7 +198,7 @@
         
                 movies.forEach(movie => {
                     const cardLink = document.createElement("a");
-                    cardLink.href = `http://127.0.0.1:8000/movie/${movie.movieId}`;
+                    cardLink.href = `/movie/${movie.movieId}`;
                     cardLink.classList.add("card-link");
         
                     const movieCard = document.createElement("div");
@@ -259,7 +254,6 @@
                 }
             }
         
-            // Fungsi untuk tombol Next
             function next() {
                 if (hasNext) {
                     page++;
@@ -267,7 +261,6 @@
                 }
             }
         
-            // Inisialisasi halaman berdasarkan URL saat dimuat
             window.onload = function() {
                 const params = getQueryParams();
                 page = params.page;
@@ -276,7 +269,6 @@
                 fetchResult();
             };
         
-            // Optional: Menangani navigasi browser (back/forward)
             window.onpopstate = function(event) {
                 const params = getQueryParams();
                 page = params.page;
