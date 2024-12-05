@@ -10,3 +10,4 @@ pandas
 bs4
 html5lib
 python-dotenv
+whitenoise

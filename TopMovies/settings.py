@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+import mimetypes
 from pathlib import Path
+
+mimetypes.add_type("text/javascript", ".js", True)
+mimetypes.add_type("text/css", ".css", True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +29,7 @@ GRAPHDB_URL = os.getenv("GRAPHDB_URL", "http://localhost:7200/repositories/Nama-
 SECRET_KEY = 'django-insecure-au9r8+2!z)g4x*2ni2*)(^p(=h*l=t=^r=8sp%t7$-cc2z*-ro'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.getenv("DEBUG", "1")))
 
 ALLOWED_HOSTS = ["*"]
 
@@ -51,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'TopMovies.urls'
@@ -136,3 +141,4 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Konfigurasi untuk penyimpanan file statis (gunakan whitenoise untuk production)
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
