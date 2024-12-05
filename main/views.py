@@ -24,6 +24,7 @@ def search_movies(request):
     PAGE_SIZE = 20
     movie = request.GET.get("movie", "")
     page = int(request.GET.get("page", 1))
+    genre = request.GET.get("genre", "")
 
     sparql_query = f"""
     PREFIX : <http://nama-kelompok.org/data/> 
@@ -33,17 +34,25 @@ def search_movies(request):
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    SELECT DISTINCT * WHERE {{
+    SELECT DISTINCT ?movieId ?movieName ?posterLink ?releaseYear WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
-        OPTIONAL {{ ?movieId v:posterLink ?posterLink . }}
-        OPTIONAL {{ ?movieId v:posterLinkWikipedia ?posterLinkWikipedia . }}
-        OPTIONAL {{ ?movieId v:releaseYear ?releaseYear . }}
-        FILTER(REGEX(?movieName, ".*{movie}.*", "i"))
-    }} ORDER BY ?movieName
-    OFFSET {(page - 1) * PAGE_SIZE}
-    LIMIT {PAGE_SIZE + 1}
+        OPTIONAL {{?movieId v:posterLink ?posterLink .}}
+        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}  # Ambil tahun rilis jika tersedia
+        FILTER(REGEX(?movieName, ".*{movie}.*", "i")) 
     """
+    if genre != "":
+        sparql_query += f"""
+                ?movieId v:genre ?genre .
+                FILTER(REGEX(?genre, "{genre}", "i"))
+        """
+
+    sparql_query += f""" 
+        }} ORDER BY ?movieName
+        OFFSET {(page - 1) * PAGE_SIZE}
+        LIMIT {PAGE_SIZE + 1}
+    """
+
     local_sparql.setQuery(sparql_query)
     query_results = local_sparql.query().convert()["results"]["bindings"]
 

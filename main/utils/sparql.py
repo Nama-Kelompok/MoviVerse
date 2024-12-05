@@ -1,8 +1,8 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
+from django.conf import settings
 
 # Inisialisasi SPARQL endpoints
-host = "http://localhost:7200"
-local_sparql = SPARQLWrapper(f"{host}/repositories/Nama-Kelompok")
+local_sparql = SPARQLWrapper(settings.GRAPHDB_URL)
 local_sparql.setReturnFormat(JSON)
 wikidata_sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
 wikidata_sparql.setReturnFormat(JSON)

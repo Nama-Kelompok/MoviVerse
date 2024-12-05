@@ -30,7 +30,8 @@ if start_len <= 999:
                 PREFIX wd: <http://www.wikidata.org/entity/>
                 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
                 SELECT DISTINCT ?id where {{
-                  ?id wdt:P31 wd:Q11424 .
+                  ?tipe wdt:P279* wd:Q11424 .
+                  ?id wdt:P31 ?tipe .
                   ?id rdfs:label ?filmlabel .
                   ?id wdt:P577 ?releasedate .
                   FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
@@ -42,7 +43,8 @@ if start_len <= 999:
                 PREFIX wd: <http://www.wikidata.org/entity/>
                 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
                 SELECT DISTINCT ?id where {{
-                  ?id wdt:P31 wd:Q11424 .
+                  ?tipe wdt:P279* wd:Q11424 .
+                  ?id wdt:P31 ?tipe .
                   ?id rdfs:label ?filmlabel .
                   ?id wdt:P577 ?releasedate .
                   FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
@@ -88,7 +90,8 @@ if start_len <= 999:
                 PREFIX wd: <http://www.wikidata.org/entity/>
                 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
                 SELECT DISTINCT ?id where {{
-                  ?id wdt:P31 wd:Q11424 .
+                  ?tipe wdt:P279* wd:Q11424 .
+                  ?id wdt:P31 ?tipe .
                   ?id rdfs:label ?filmlabel .
                   ?id wdt:P577 ?releasedate .
                   FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
@@ -100,7 +103,8 @@ if start_len <= 999:
                 PREFIX wd: <http://www.wikidata.org/entity/>
                 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
                 SELECT DISTINCT ?id where {{
-                  ?id wdt:P31 wd:Q11424 .
+                  ?tipe wdt:P279* wd:Q11424 .
+                  ?id wdt:P31 ?tipe .
                   ?id rdfs:label ?filmlabel .
                   ?id wdt:P577 ?releasedate .
                   FILTER (REGEX(?filmlabel, "^{title}$", "i")) .
