@@ -116,8 +116,7 @@ def get_movie_details(request, uri=None):
     SELECT DISTINCT ?movies ?title ?director 
            (GROUP_CONCAT(DISTINCT ?genre; separator=", ") AS ?genres) 
            ?rating ?metaScore ?information 
-           (SAMPLE(?posterLink) AS ?posterLink) 
-           (SAMPLE(?posterLinkWikipedia) AS ?posterLinkWikipedia) 
+           (SAMPLE(?posterLink) AS ?posterLink)
            ?releaseYear ?runningTime 
            (GROUP_CONCAT(DISTINCT ?star; separator=", ") AS ?stars) 
            ?votes ?wikidataUri ?distributor
@@ -134,7 +133,6 @@ def get_movie_details(request, uri=None):
         OPTIONAL {{ ?movies v:metaScore ?metaScore. }}
         OPTIONAL {{ ?movies v:movieInfo ?information. }}
         OPTIONAL {{ ?movies v:posterLink ?posterLink. }}
-        OPTIONAL {{ ?movies v:posterLinkWikipedia ?posterLinkWikipedia. }}
         OPTIONAL {{ ?movies v:releaseYear ?releaseYear. }}
         OPTIONAL {{ ?movies v:runningTime ?runningTime. }}
         OPTIONAL {{ ?movies v:star ?star. }}
