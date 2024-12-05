@@ -141,10 +141,10 @@ def get_movie_details(request, uri=None):
         OPTIONAL {{ ?movies v:metaScore ?metaScore. }}
         OPTIONAL {{ ?movies v:movieInfo ?information. }}
 
-        OPTIONAL {{ ?movieId v:posterLink ?wikipediaPosterLink . 
+        OPTIONAL {{ ?movies v:posterLink ?wikipediaPosterLink . 
         FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
         
-        OPTIONAL {{ ?movieId v:posterLink ?otherPosterLink .
+        OPTIONAL {{ ?movies v:posterLink ?otherPosterLink .
         FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
         OPTIONAL {{ ?movies v:releaseYear ?releaseYear. }}
         OPTIONAL {{ ?movies v:runningTime ?runningTime. }}
@@ -161,19 +161,20 @@ def get_movie_details(request, uri=None):
         VALUES ?movies {{ <{uri}> }} 
     }}
     GROUP BY ?movies ?title ?director ?rating ?metaScore ?information 
-             ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
-             ?budget ?certificate ?domesticOpening ?domesticSales 
-             ?internationalSales ?license ?releaseDate
+         ?releaseYear ?runningTime ?votes ?wikidataUri ?distributor
+         ?budget ?certificate ?domesticOpening ?domesticSales 
+         ?internationalSales ?license ?releaseDate 
+         ?wikipediaPosterLink ?otherPosterLink
     LIMIT 1
     """
     local_sparql.setQuery(sparql_query)
-
+    print(sparql_query)
     try:
         results = local_sparql.query().convert()
 
         attributes = [
             "director", "genres", "rating", "metaScore", "information",
-            "posterLink", "releaseYear", "runningTime", 
+            "finalPosterLink", "releaseYear", "runningTime", 
             "stars", "votes", "wikidataUri", "distributor",
             "budget", "certificate", "domesticOpening", "domesticSales",
             "internationalSales", "license", "releaseDate"
@@ -236,7 +237,7 @@ def get_movie_details(request, uri=None):
             data_movie["filming_locations"] = filming_locations
 
             # Menetapkan photoUrl
-            poster_link = data_movie.get("posterLink", "").strip() 
+            poster_link = data_movie.get("finalPosterLink", "").strip() 
             if poster_link and poster_link != "Tidak terdapat data posterLink":
                 data_movie["photoUrl"] = poster_link
             else:
