@@ -9,6 +9,14 @@ from .utils.screenwriter import fetch_all_screenwriters
 from .utils.review import fetch_review_scores
 from .utils.time import format_running_time
 from .utils.additional import fetch_country_of_origin, fetch_awards_received, fetch_filming_locations
+from .utils.supporting import (
+    fetch_director_of_photography,
+    fetch_film_editor,
+    fetch_production_designer,
+    fetch_costume_designer,
+    fetch_composer,
+    fetch_producer
+)
 
 from .utils.sparql import local_sparql 
 
@@ -22,10 +30,26 @@ def main_page(request):
 
 def search_movies(request):
     PAGE_SIZE = 20
-    movie = request.GET.get("movie", "")
+    search_input = request.GET.get("movie", "").strip()
+    sort_input = request.GET.get("sort", "").strip()
     page = int(request.GET.get("page", 1))
-    genre = request.GET.get("genre", "")
-
+    
+    # Menentukan ORDER BY berdasarkan sort_input
+    if sort_input == "alphabet_asc":
+        order_by = "ASC(?movieName)"
+    elif sort_input == "budget":
+        order_by = "DESC(?budget)"
+    elif sort_input == "title_desc":
+        order_by = "DESC(?movieName)"
+    elif sort_input == "release_year":
+        order_by = "DESC(xsd:integer(?releaseYear))"
+    elif sort_input == "rating":
+        order_by = "DESC(xsd:decimal(?rating))"
+    elif sort_input == "international_sales":
+        order_by = "DESC(xsd:decimal(?internationalSales))"
+    else:
+        order_by = "ASC(?movieName)"
+    
     sparql_query = f"""
     PREFIX : <http://nama-kelompok.org/data/> 
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -34,69 +58,63 @@ def search_movies(request):
     PREFIX wd: <http://www.wikidata.org/entity/>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    SELECT DISTINCT ?movieId ?movieName (COALESCE(?wikipediaPosterLink, ?otherPosterLink) AS ?finalPosterLink) ?releaseYear WHERE {{
+    SELECT DISTINCT ?movieId ?movieName 
+           (COALESCE(?wikipediaPosterLink, ?otherPosterLink) AS ?finalPosterLink) 
+           ?releaseYear ?rating ?internationalSales (SAMPLE(xsd:integer(?budget)) AS ?normalizedBudget) WHERE {{
         ?movieId rdf:type :Movie .
         ?movieId rdfs:label ?movieName .
         
-        # Ambil link Wikipedia
         OPTIONAL {{ ?movieId v:posterLink ?wikipediaPosterLink . 
-        FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
+                   FILTER(CONTAINS(STR(?wikipediaPosterLink), "upload.wikimedia.org")) }}
         
-        # Ambil link lainnya
         OPTIONAL {{ ?movieId v:posterLink ?otherPosterLink .
-               FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
-               
-        OPTIONAL {{?movieId v:releaseYear ?releaseYear .}}
-        FILTER(REGEX(?movieName, ".*{movie}.*", "i")) 
-    """
-    
-
-    if genre != "":
-        sparql_query += f"""
-                ?movieId v:genre ?genre .
-                FILTER(REGEX(?genre, "{genre}", "i"))
-        """
-
-    sparql_query += f""" 
-        }} ORDER BY ?movieName
-        OFFSET {(page - 1) * PAGE_SIZE}
-        LIMIT {PAGE_SIZE + 1}
+                   FILTER(!CONTAINS(STR(?otherPosterLink), "upload.wikimedia.org")) }}
+                   
+        OPTIONAL {{ ?movieId v:releaseYear ?releaseYear . }}
+        OPTIONAL {{ ?movieId v:imdbRating ?rating . }}
+        OPTIONAL {{ ?movieId v:internationalSales ?internationalSales . }}
+        OPTIONAL {{ ?movieId v:budget ?budget . }}
+        OPTIONAL {{ ?movieId v:genre ?genre . }}
+        
+        FILTER(
+            REGEX(?movieName, ".*{search_input}.*", "i") || 
+            (BOUND(?genre) && REGEX(?genre, ".*{search_input}.*", "i"))
+        )
+    }}GROUP BY ?movieId ?movieName ?wikipediaPosterLink ?otherPosterLink 
+          ?releaseYear ?rating ?internationalSales
+    ORDER BY {order_by}
+    OFFSET {(page - 1) * PAGE_SIZE}
+    LIMIT {PAGE_SIZE + 1}
     """
 
     local_sparql.setQuery(sparql_query)
-    query_results = local_sparql.query().convert()["results"]["bindings"]
+    try:
+        query_results = local_sparql.query().convert()["results"]["bindings"]
 
-    hasNextPage = False
-    if len(query_results) > PAGE_SIZE:
-        hasNextPage = True
-        query_results = query_results[:PAGE_SIZE]
+        hasNextPage = False
+        if len(query_results) > PAGE_SIZE:
+            hasNextPage = True
+            query_results = query_results[:PAGE_SIZE]
 
-    data = {}
-    data["hasNextPage"] = hasNextPage
-    data["currentPage"] = page
+        data = {
+            "hasNextPage": hasNextPage,
+            "currentPage": page,
+            "movies": []
+        }
 
-    movies = []
-    for movie in query_results:
-        tempData = {}
-        tempData["movieId"] = movie['movieId']["value"]
-        tempData["movieName"] = movie["movieName"]["value"]
-        
-        # Mengambil posterLink atau posterLinkWikipedia
-        if "finalPosterLink" in movie:
-            tempData["posterLink"] = movie["finalPosterLink"]["value"]
-        else:
-            tempData["posterLink"] = "/static/user/images/placeholder.jpg"
+        for movie in query_results:
+            tempData = {
+                "movieId": movie['movieId']["value"],
+                "movieName": movie["movieName"]["value"],
+                "posterLink": movie.get("finalPosterLink", {}).get("value", "/static/user/images/default.jpg"),
+                "releaseYear": movie.get("releaseYear", {}).get("value", "Unknown")
+            }
+            data["movies"].append(tempData)
 
-        if "releaseYear" in movie:
-            tempData["releaseYear"] = movie["releaseYear"]["value"] 
-        else:
-            tempData["releaseYear"] = "Unknown"
-        
-        movies.append(tempData)
+        return JsonResponse(data)
 
-    data["movies"] = movies
-    return JsonResponse(data)
-
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 # Mengambil data dari movie
 def get_movie_data(request, id):
@@ -168,7 +186,6 @@ def get_movie_details(request, uri=None):
     LIMIT 1
     """
     local_sparql.setQuery(sparql_query)
-    print(sparql_query)
     try:
         results = local_sparql.query().convert()
 
@@ -235,6 +252,14 @@ def get_movie_details(request, uri=None):
 
             filming_locations = fetch_filming_locations(data_movie["wikidataUri"])
             data_movie["filming_locations"] = filming_locations
+
+            # Fetch crew members
+            data_movie["director_of_photography"] = fetch_director_of_photography(data_movie["wikidataUri"])
+            data_movie["film_editor"] = fetch_film_editor(data_movie["wikidataUri"])
+            data_movie["production_designer"] = fetch_production_designer(data_movie["wikidataUri"])
+            data_movie["costume_designer"] = fetch_costume_designer(data_movie["wikidataUri"])
+            data_movie["composer"] = fetch_composer(data_movie["wikidataUri"])
+            data_movie["producer"] = fetch_producer(data_movie["wikidataUri"])
 
             # Menetapkan photoUrl
             poster_link = data_movie.get("finalPosterLink", "").strip() 
