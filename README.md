@@ -1,11 +1,10 @@
-#### Anggota Kelompok
-1. Muhammad Rafli Mahesa (2206828140)
-2. Farrell Muhammad Hanau (2206081566)
-3. Bimantoro Widyadana (2206824306)
-4. I Made Surya Anahata Putra (2206081370)
+### Project Description
+This project aims to develop an interactive website that allows users to explore movie data using two main local datasets: Highest Hollywood Grossing Movies and IMDB Top 1000. Additionally, the dataset is also retrieved remotely from Wikidata.
+<br>
+The application is designed to present structured information, providing comprehensive details about various films. Users can easily browse and compare movies based on specific preferences, such as genre or release year. With an intuitively designed interface, the application aims to offer a more informative browsing experience, helping users understand the connections and insights behind the movies. This project is developed as part of the Knowledge Graph course assignment for the 2024/2025 academic term.
 
-### Deskripsi Proyek
-Proyek ini bertujuan untuk membangun sebuah website interaktif yang memungkinkan pengguna untuk melakukan eksplorasi data film menggunakan dua dataset utama pada local, yaitu Highest Hollywood Grossing Movies dan IMDB Top 1000. Selain itu dataset juga diambil dari remote yaitu Wikidata. <Br> 
-
-Aplikasi ini dirancang untuk menyajikan informasi terstruktur yang mencakup detail terkait berbagai suatu film.
-Pengguna dapat dengan mudah menelusuri dan membandingkan film berdasarkan preferensi tertentu, seperti genre atau tahun rilis. Dengan antarmuka yang dirancang intuitif, aplikasi ini diharapkan dapat memberikan pengalaman penjelajahan yang lebih informatif, sehingga membantu pengguna memahami hubungan dan informasi di balik film. Proyek ini dikerjakan sebagai bagian dari tugas mata kuliah Graf Pengetahuan Gasal 2024/2025.
+### Glimpse of What We Create
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
